@@ -28,7 +28,7 @@ For Windows, use one of the generated installers from the release assets:
 - `SaveIt_1.0.0_x64-setup.exe` for the NSIS installer
 - `SaveIt_1.0.0_x64_en-US.msi` for the MSI installer
 
-The standalone executable is `saveit.exe`.
+The standalone portable executable is `saveit.exe`.
 
 ## Requirements
 

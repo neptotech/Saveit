@@ -781,6 +781,8 @@ async function saveItem(item){
   toast(idx>=0?'Updated!':'Saved!','success');
 }
 
+function foldersForNewItem(){return activeFolderId?[activeFolderId]:[]}
+
 function extractLinkTitle(html,url){
   if(!html)return url;
   const m=html.match(/>([^<]{2,80})</);
@@ -795,11 +797,11 @@ async function processRawContent(html,plain,files){
       if(f.type.startsWith('image/')){
         const reader=new FileReader();
         reader.onload=async ev=>{
-          await saveItem({id:uid(),type:'image',data:ev.target.result,path:stored.path,filename:f.name,folders:[],savedAt:Date.now()});
+          await saveItem({id:uid(),type:'image',data:ev.target.result,path:stored.path,filename:f.name,folders:foldersForNewItem(),savedAt:Date.now()});
         };
         reader.readAsDataURL(f);
       } else {
-        await saveItem({id:uid(),type:'file',path:stored.path,filename:f.name,mime:f.type||'application/octet-stream',size:f.size,folders:[],savedAt:Date.now()});
+        await saveItem({id:uid(),type:'file',path:stored.path,filename:f.name,mime:f.type||'application/octet-stream',size:f.size,folders:foldersForNewItem(),savedAt:Date.now()});
       }
     }
     return true;
@@ -807,7 +809,7 @@ async function processRawContent(html,plain,files){
   const textTrimmed=(plain||'').trim();
   // 2. Pure URL
   if(!html&&isURL(textTrimmed)){
-    await saveItem({id:uid(),type:'link',url:textTrimmed,title:textTrimmed,folders:[],savedAt:Date.now()});
+    await saveItem({id:uid(),type:'link',url:textTrimmed,title:textTrimmed,folders:foldersForNewItem(),savedAt:Date.now()});
     return true;
   }
   // 3. HTML containing rich content
@@ -817,20 +819,20 @@ async function processRawContent(html,plain,files){
     const anchors=div.querySelectorAll('a');
     const imgSrc=(()=>{const img=div.querySelector('img');return img?img.src:null})();
     if(imgSrc&&/\.(png|jpg|jpeg|gif|webp|svg|avif)(\?.*)?$/i.test(imgSrc)&&stripHTML(html).trim().length<20){
-      await saveItem({id:uid(),type:'image',src:imgSrc,folders:[],savedAt:Date.now()});
+      await saveItem({id:uid(),type:'image',src:imgSrc,folders:foldersForNewItem(),savedAt:Date.now()});
       return true;
     }
     if(anchors.length===1&&stripHTML(html).trim().length<100&&isURL(anchors[0].href)){
-      await saveItem({id:uid(),type:'link',url:anchors[0].href,title:stripHTML(html).trim()||anchors[0].href,folders:[],savedAt:Date.now()});
+      await saveItem({id:uid(),type:'link',url:anchors[0].href,title:stripHTML(html).trim()||anchors[0].href,folders:foldersForNewItem(),savedAt:Date.now()});
       return true;
     }
     // Rich text — sanitize preserving colors
     const cleanHtml=sanitizeHTML(html);
-    await saveItem({id:uid(),type:'text',html:cleanHtml,plain:plain||stripHTML(cleanHtml),folders:[],savedAt:Date.now()});
+    await saveItem({id:uid(),type:'text',html:cleanHtml,plain:plain||stripHTML(cleanHtml),folders:foldersForNewItem(),savedAt:Date.now()});
     return true;
   }
   if(textTrimmed){
-    await saveItem({id:uid(),type:'text',plain:textTrimmed,folders:[],savedAt:Date.now()});
+    await saveItem({id:uid(),type:'text',plain:textTrimmed,folders:foldersForNewItem(),savedAt:Date.now()});
     return true;
   }
   return false;
@@ -864,8 +866,9 @@ async function processDrop(e){
 
 /* ══ Paste (Ctrl+V) — save immediately like a drop ══ */
 document.addEventListener('paste',async e=>{
-  // Don't intercept paste inside the editor
-  if(editorModal.classList.contains('open'))return;
+  // Let native inputs and editable regions handle their own paste.
+  const activeElement=document.activeElement;
+  if(activeElement?.matches('input,textarea,select,[contenteditable="true"]')||activeElement?.isContentEditable)return;
   e.preventDefault();
   const cd=e.clipboardData;
   if(!cd)return;
@@ -879,7 +882,7 @@ document.addEventListener('paste',async e=>{
       if(f){
         const reader=new FileReader();
         reader.onload=async ev=>{
-          await saveItem({id:uid(),type:'image',data:ev.target.result,filename:'clipboard-image.png',folders:[],savedAt:Date.now()});
+          await saveItem({id:uid(),type:'image',data:ev.target.result,filename:'clipboard-image.png',folders:foldersForNewItem(),savedAt:Date.now()});
         };
         reader.readAsDataURL(f);
         return;
@@ -1414,20 +1417,20 @@ document.getElementById('ed-save-btn').addEventListener('click',async()=>{
     const url=editorUrlInput.value.trim();
     if(!url){toast('Enter a URL','error');return}
     const linkTitle=title||editorBody.textContent.trim()||url;
-    await saveItem({id:editingId||uid(),type:'link',url,title:linkTitle,folders:editingId?(allItems.find(i=>i.id===editingId)?.folders||[]):[],savedAt:editingId?allItems.find(i=>i.id===editingId)?.savedAt||Date.now():Date.now(),updatedAt:Date.now()});
+    await saveItem({id:editingId||uid(),type:'link',url,title:linkTitle,folders:editingId?(allItems.find(i=>i.id===editingId)?.folders||[]):foldersForNewItem(),savedAt:editingId?allItems.find(i=>i.id===editingId)?.savedAt||Date.now():Date.now(),updatedAt:Date.now()});
     closeEditor();return;
   }
 
   if(type==='image'){
     const url=editorUrlInput.value.trim();
     if(url){
-      await saveItem({id:editingId||uid(),type:'image',src:url,title:title||url,folders:editingId?(allItems.find(i=>i.id===editingId)?.folders||[]):[],savedAt:editingId?allItems.find(i=>i.id===editingId)?.savedAt||Date.now():Date.now(),updatedAt:Date.now()});
+      await saveItem({id:editingId||uid(),type:'image',src:url,title:title||url,folders:editingId?(allItems.find(i=>i.id===editingId)?.folders||[]):foldersForNewItem(),savedAt:editingId?allItems.find(i=>i.id===editingId)?.savedAt||Date.now():Date.now(),updatedAt:Date.now()});
       closeEditor();return;
     }
     // image in body
     const imgEl=editorBody.querySelector('img');
     if(imgEl){
-      await saveItem({id:editingId||uid(),type:'image',data:imgEl.src,title:title||'Image',folders:editingId?(allItems.find(i=>i.id===editingId)?.folders||[]):[],savedAt:editingId?allItems.find(i=>i.id===editingId)?.savedAt||Date.now():Date.now(),updatedAt:Date.now()});
+      await saveItem({id:editingId||uid(),type:'image',data:imgEl.src,title:title||'Image',folders:editingId?(allItems.find(i=>i.id===editingId)?.folders||[]):foldersForNewItem(),savedAt:editingId?allItems.find(i=>i.id===editingId)?.savedAt||Date.now():Date.now(),updatedAt:Date.now()});
       closeEditor();return;
     }
     toast('No image to save','error');return;
@@ -1446,7 +1449,7 @@ document.getElementById('ed-save-btn').addEventListener('click',async()=>{
     html:cleanHtml,
     plain,
     title:title||plain.slice(0,60),
-    folders:existing?(existing.folders||[]):[],
+    folders:existing?(existing.folders||[]):foldersForNewItem(),
     savedAt:existing?existing.savedAt:Date.now(),
     updatedAt:Date.now()
   });
