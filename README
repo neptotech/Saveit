@@ -4,7 +4,7 @@ SaveIt is a fast, local-first desktop inbox for keeping text, rich content, link
 
 Built with Rust and Tauri 2. [Thus light weight *8MB* portable app or *2MB installer*!]
 
-**Flashback:** Made to store my college documents, notes, resources, informations etc organised into folders which are course names in my case. Free notion can have only 5mb file and free onenote only 100mb. But here the files are cleanly stored in a folder and used,and all the notes in a json file. Both can be setup to be backed up in onedrive(default). And I can thus use it with both laptop and pc using same onedrive...
+**Flashback:** Made to store my college documents, notes, resources, informations etc organised into folders which are course names in my case, From widespread sources like *email,google groups,google classroom,drive,external links*. Free notion can have only 5mb file and free onenote only 100mb. But here the files are cleanly stored in a folder and used,and all the notes in a json file. Both can be setup to be backed up in onedrive(default). And I can thus use it with both laptop and pc using same onedrive...
 
 ## Features
 
