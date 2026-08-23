@@ -1,0 +1,109 @@
+﻿# SaveIt
+
+SaveIt is a fast, local-first desktop inbox for keeping text, rich content, links, images, and files organised in one place. Drop content onto the home screen, paste from the clipboard, or write a note in the editor, and save them into a folder.
+
+Built with Rust and Tauri 2.
+
+## Features
+
+- Drag and drop text, rich HTML, links, images, and files onto the home screen
+- Drop files into the editor at the mouse-release position
+- Upload files through the editor toolbar
+- Copy imported files into `C:\Users\Admin\OneDrive\Documents\SaveItFiles\`
+- Store notes and folder metadata in `C:\Users\Admin\OneDrive\Documents\saveit.json`
+- Organize notes with folders and drag notes between folders
+- Search, filter, sort, and switch between grid and list views
+- Edit rich text with formatting, links, images, colors, and highlights
+- Open web links in the default browser
+- Open saved files with their Windows file association or Open With dialog
+- Multi-select notes with Ctrl/Cmd-click and Shift-click
+
+## Download
+
+For Windows, use one of the generated installers from the release assets:
+
+- `SaveIt_1.0.0_x64-setup.exe` for the NSIS installer
+- `SaveIt_1.0.0_x64_en-US.msi` for the MSI installer
+
+The standalone executable is `saveit.exe`.
+
+## Requirements
+
+- Windows 10 or later
+- Microsoft Edge WebView2 Runtime
+- Node.js and npm for development
+- Rust and Cargo for development and building
+
+OneDrive is recommended because SaveIt stores its data in the OneDrive Documents folder. The application creates `SaveItFiles` when the first file is imported.
+
+## Development
+
+Install the JavaScript dependencies:
+
+```powershell
+npm install
+```
+
+Start the Tauri development application:
+
+```powershell
+npm run dev
+```
+
+Check the Rust backend:
+
+```powershell
+cargo check --manifest-path src-tauri\Cargo.toml
+```
+
+Run Rust tests:
+
+```powershell
+cargo test --manifest-path src-tauri\Cargo.toml
+```
+
+## Build
+
+Create the optimized executable and Windows installers:
+
+```powershell
+npm run build
+```
+
+Build output is written to:
+
+```text
+src-tauri/target/release/saveit.exe
+src-tauri/target/release/bundle/nsis/SaveIt_1.0.0_x64-setup.exe
+src-tauri/target/release/bundle/msi/SaveIt_1.0.0_x64_en-US.msi
+```
+
+## Data and file storage
+
+SaveIt keeps the main document at:
+
+```text
+C:\Users\Admin\OneDrive\Documents\saveit.json
+```
+
+Imported files are copied into:
+
+```text
+C:\Users\Admin\OneDrive\Documents\SaveItFiles\
+```
+
+Notes reference the copied file rather than the original source location. Saved-file opening is restricted to the `SaveItFiles` directory.
+
+## Project layout
+
+```text
+frontend/index.html       Application UI and client-side behavior
+src-tauri/src/lib.rs      Rust commands for JSON and file storage
+src-tauri/src/main.rs     Tauri application entry point
+src-tauri/tauri.conf.json Tauri window and bundle configuration
+src-tauri/icons/          Application icon assets
+```
+
+## License
+
+Add the project license here before publishing if this repository will be reused or distributed publicly.
