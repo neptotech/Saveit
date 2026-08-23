@@ -258,6 +258,16 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--text);min-heigh
 /* ── Toasts ── */
 #toast-root{position:fixed;bottom:22px;right:22px;z-index:400;display:flex;flex-direction:column;gap:7px;align-items:flex-end;pointer-events:none}
 .toast{background:var(--base02);color:var(--base3);padding:9px 15px;border-radius:var(--radius);font-size:13px;box-shadow:0 4px 20px rgba(0,0,0,.25);animation:toast-in .2s ease both;pointer-events:auto;display:flex;align-items:center;gap:7px;max-width:280px}
+#settings-modal{position:fixed;inset:0;z-index:600;background:rgba(0,43,54,.55);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center}
+#settings-modal.open{display:flex}
+#settings-panel{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-hover);width:min(560px,calc(100% - 32px));padding:22px 24px;animation:panel-in .18s ease both}
+#settings-panel h3{font-size:17px;color:var(--text-em);margin-bottom:7px}
+#settings-panel p{font-size:13px;color:var(--text-dim);line-height:1.5;margin-bottom:14px}
+#storage-path-input{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg-subtle);color:var(--text);font:13px var(--font-mono);outline:none}
+#storage-path-input:focus{border-color:var(--accent)}
+#settings-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+#settings-actions button{padding:7px 14px;border:1px solid var(--border);border-radius:7px;background:var(--bg-subtle);color:var(--text-em);font:13px var(--font-ui);cursor:pointer}
+#settings-save-btn{background:var(--accent)!important;color:#fff!important;border-color:var(--accent)!important}
 .toast.success{border-left:3px solid var(--green)}
 .toast.info{border-left:3px solid var(--blue)}
 .toast.error{border-left:3px solid var(--red)}
@@ -320,9 +330,25 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--text);min-heigh
     <button class="tb-btn" id="btn-list" title="List view">
       <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M5 4h9M5 8h9M5 12h9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="2" cy="4" r="1" fill="currentColor"/><circle cx="2" cy="8" r="1" fill="currentColor"/><circle cx="2" cy="12" r="1" fill="currentColor"/></svg>
     </button>
+    <button class="tb-btn" id="settings-btn" title="Storage settings">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6.7 1.8h2.6l.5 1.8c.4.2.8.4 1.2.7l1.8-.5 1.3 2.2-1.3 1.3v1.4l1.3 1.3-1.3 2.2-1.8-.5c-.4.3-.8.5-1.2.7l-.5 1.8H6.7l-.5-1.8c-.4-.2-.8-.4-1.2-.7l-1.8.5-1.3-2.2 1.3-1.3V7.3L1.9 6l1.3-2.2 1.8.5c.4-.3.8-.5 1.2-.7l.5-1.8Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><circle cx="8" cy="8" r="2.2" stroke="currentColor" stroke-width="1.2"/></svg>
+      Settings
+    </button>
     <span id="item-count"></span>
   </div>
 </header>
+
+<div id="settings-modal">
+  <div id="settings-panel">
+    <h3>Storage location</h3>
+    <p>SaveIt stores saveit.json and the SaveItFiles folder together. The destination must be new or empty. Existing data will be copied before the app reloads.</p>
+    <input id="storage-path-input" type="text" spellcheck="false">
+    <div id="settings-actions">
+      <button id="settings-cancel-btn">Cancel</button>
+      <button id="settings-save-btn">Move and reload</button>
+    </div>
+  </div>
+</div>
 
 <div id="app-layout">
 <aside id="folder-sidebar">
@@ -522,12 +548,14 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--text);min-heigh
    ══════════════════════════════════════════════════════ */
 const invoke=window.__TAURI__?.core?.invoke;
 let saveitData={items:[],folders:[]};
+let storagePath=localStorage.getItem('saveit.storagePath')||'';
 async function openDB(){
   if(!invoke)throw new Error('SaveIt must be run as a Tauri desktop app');
-  const data=await invoke('load_data');
+  if(!storagePath)storagePath=await invoke('get_default_storage_path');
+  const data=await invoke('load_data',{storagePath});
   saveitData={items:Array.isArray(data?.items)?data.items:[],folders:Array.isArray(data?.folders)?data.folders:[]};
 }
-const persist=()=>invoke('save_data',{data:saveitData});
+const persist=()=>invoke('save_data',{storagePath,data:saveitData});
 const dbGetAll=async()=>saveitData.items;
 const dbPut=async item=>{const idx=saveitData.items.findIndex(i=>i.id===item.id);if(idx>=0)saveitData.items[idx]=item;else saveitData.items.push(item);await persist()};
 const dbDelete=async id=>{saveitData.items=saveitData.items.filter(item=>item.id!==id);await persist()};
@@ -591,6 +619,9 @@ const confirmModal=document.getElementById('confirm-modal');
 const confirmTitle=document.getElementById('confirm-title');
 const confirmMsg=document.getElementById('confirm-msg');
 const confirmActions=document.getElementById('confirm-actions');
+const settingsModal=document.getElementById('settings-modal');
+const settingsPathInput=document.getElementById('storage-path-input');
+const settingsSaveBtn=document.getElementById('settings-save-btn');
 
 /* ══ Utilities ══ */
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
@@ -609,7 +640,7 @@ function openExternal(url){
   window.open(url,'_blank','noopener,noreferrer');
 }
 function openStoredFile(path){
-  return invoke('open_file',{path}).catch(error=>toast(String(error),'error'));
+  return invoke('open_file',{storagePath,path}).catch(error=>toast(String(error),'error'));
 }
 document.addEventListener('click',e=>{
   const storedFile=e.target.closest?.('[data-saveit-file-path]');
@@ -807,7 +838,7 @@ async function processRawContent(html,plain,files){
 
 async function storeBrowserFile(file){
   const dataUrl=await fileAsDataUrl(file);
-  const stored=await invoke('store_file',{filename:file.name,contents:String(dataUrl).split(',')[1]||''});
+  const stored=await invoke('store_file',{storagePath,filename:file.name,contents:String(dataUrl).split(',')[1]||''});
   return stored;
 }
 
@@ -1619,6 +1650,30 @@ document.querySelectorAll('.filter-pill').forEach(pill=>{
 });
 searchEl.addEventListener('input',()=>{searchQ=searchEl.value.trim();applyFilters()});
 
+document.getElementById('settings-btn').addEventListener('click',()=>{
+  settingsPathInput.value=storagePath;
+  settingsModal.classList.add('open');
+  settingsPathInput.focus();
+});
+document.getElementById('settings-cancel-btn').addEventListener('click',()=>settingsModal.classList.remove('open'));
+settingsModal.addEventListener('click',e=>{if(e.target===settingsModal)settingsModal.classList.remove('open')});
+settingsSaveBtn.addEventListener('click',async()=>{
+  const newPath=settingsPathInput.value.trim();
+  if(!newPath){toast('Enter a storage path','error');return}
+  if(newPath===storagePath){settingsModal.classList.remove('open');return}
+  settingsSaveBtn.disabled=true;
+  settingsSaveBtn.textContent='Moving...';
+  try{
+    await invoke('migrate_storage',{fromPath:storagePath,toPath:newPath});
+    localStorage.setItem('saveit.storagePath',newPath);
+    location.reload();
+  }catch(error){
+    toast(String(error),'error');
+    settingsSaveBtn.disabled=false;
+    settingsSaveBtn.textContent='Move and reload';
+  }
+});
+
 /* ══ Global keyboard ══ */
 document.addEventListener('keydown',e=>{
   const inEditor=editorModal.classList.contains('open');
@@ -1632,6 +1687,7 @@ document.addEventListener('keydown',e=>{
     if(inConfirm)closeConfirm();
     else if(inEditor)closeEditor();
     else if(inFV)closeFullview();
+    else if(settingsModal.classList.contains('open'))settingsModal.classList.remove('open');
     else if(selectedIds.size){selectedIds.clear();render();updateSelectionBar()}
   }
   if((e.ctrlKey||e.metaKey)&&e.key==='n'&&!inEditor){e.preventDefault();openEditor(null)}

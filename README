@@ -9,8 +9,9 @@ Built with Rust and Tauri 2.
 - Drag and drop text, rich HTML, links, images, and files onto the home screen
 - Drop files into the editor at the mouse-release position
 - Upload files through the editor toolbar
-- Copy imported files into `C:\Users\Admin\OneDrive\Documents\SaveItFiles\`
-- Store notes and folder metadata in `C:\Users\Admin\OneDrive\Documents\saveit.json`
+- Store notes and copied files in the user's OneDrive Documents folder when available
+- Fall back to the user's local Documents folder when OneDrive Documents is unavailable
+- Change the storage root from the Settings menu; SaveIt copies existing data before reloading
 - Organize notes with folders and drag notes between folders
 - Search, filter, sort, and switch between grid and list views
 - Edit rich text with formatting, links, images, colors, and highlights
@@ -34,7 +35,7 @@ The standalone executable is `saveit.exe`.
 - Node.js and npm for development
 - Rust and Cargo for development and building
 
-OneDrive is recommended because SaveIt stores its data in the OneDrive Documents folder. The application creates `SaveItFiles` when the first file is imported.
+SaveIt uses `%USERPROFILE%\OneDrive\Documents` by default when that folder exists, otherwise `%USERPROFILE%\Documents`. The application creates `SaveItFiles` when the first file is imported.
 
 ## Development
 
@@ -80,19 +81,19 @@ src-tauri/target/release/bundle/msi/SaveIt_1.0.0_x64_en-US.msi
 
 ## Data and file storage
 
-SaveIt keeps the main document at:
+SaveIt keeps the main document at `<storage-root>\saveit.json`, where `<storage-root>` is selected automatically or in Settings.
 
 ```text
-C:\Users\Admin\OneDrive\Documents\saveit.json
+<storage-root>\saveit.json
 ```
 
 Imported files are copied into:
 
 ```text
-C:\Users\Admin\OneDrive\Documents\SaveItFiles\
+<storage-root>\SaveItFiles\
 ```
 
-Notes reference the copied file rather than the original source location. Saved-file opening is restricted to the `SaveItFiles` directory.
+Notes reference the copied file rather than the original source location. A storage-path change only succeeds when the destination is new or empty; existing data is copied before the app reloads. Saved-file opening is restricted to the active `SaveItFiles` directory.
 
 ## Project layout
 

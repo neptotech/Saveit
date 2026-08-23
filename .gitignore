@@ -1,2 +1,8 @@
 node_modules
 src-tauri/target
+
+# Generated platform icon variants; keep the source SVG and Windows ICO tracked.
+src-tauri/icons/android/
+src-tauri/icons/ios/
+src-tauri/icons/*.png
+src-tauri/icons/icon.icns
