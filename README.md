@@ -1,10 +1,10 @@
 # SaveIt
 [Skip Images](#target-anchor)
-![alt text](image-2.png)
-![alt text](image-3.png)
-![](image.png)
-![alt text](image-1.png)
-![alt text](<Screenshot 2026-08-23 174517.png>)
+![alt text](images\image.png)
+![alt text](images\image-3.png)
+![](images\image.png)
+![alt text](images\image-1.png)
+![alt text](images\image-4.png)
 <a id="target-anchor"></a>
 SaveIt is a fast, local-first desktop inbox for keeping text, rich content, links, images, and files organised in one place. Drop content onto the home screen, paste from the clipboard, or write a note in the editor, and save them into a folder.
 
