@@ -38,6 +38,19 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--text);min-heigh
 .tb-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
 #item-count{font-size:12px;color:var(--text-dim);white-space:nowrap;min-width:48px;text-align:right}
 
+/* ── Settings modal ── */
+#settings-modal{position:fixed;inset:0;z-index:420;background:rgba(0,43,54,.55);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center}
+#settings-modal.open{display:flex}
+#settings-panel{background:var(--bg);border:1px solid var(--border);box-shadow:var(--shadow-hover);border-radius:var(--radius-lg);max-width:460px;width:min(92vw,460px);padding:22px 20px;display:flex;flex-direction:column;gap:12px;animation:panel-in .18s ease both}
+#settings-panel h3{font-size:18px;color:var(--text-em)}
+#settings-panel p{font-size:13.5px;line-height:1.6;color:var(--text);margin-bottom:4px}
+#storage-path-input{width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:7px;background:var(--bg-subtle);color:var(--text-em);font-size:13.5px;font-family:var(--font-ui);outline:none}
+#storage-path-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(38,139,210,.12)}
+#settings-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:6px}
+#settings-cancel-btn,#settings-save-btn{padding:8px 12px;border-radius:6px;border:1px solid var(--border);cursor:pointer;font-size:13px;font-family:var(--font-ui)}
+#settings-cancel-btn{background:var(--bg-subtle);color:var(--text-em)}
+#settings-save-btn{background:var(--accent);color:#fff;border-color:var(--accent)}
+
 /* ── Drop overlay ── */
 #drop-overlay{position:fixed;inset:0;z-index:200;background:rgba(38,139,210,.08);backdrop-filter:blur(2px);border:3px dashed var(--accent);display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px;pointer-events:none}
 #drop-overlay.active{display:flex}
@@ -236,6 +249,32 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--text);min-heigh
 #editor-body{flex:1;padding:24px 32px;outline:none;font-size:16px;line-height:1.78;color:var(--text-em);min-height:300px;word-break:break-word}
 #editor-body:empty::before{content:attr(data-placeholder);color:var(--text-dim);pointer-events:none}
 #editor-body img{max-width:100%;border-radius:6px;display:block;margin:8px 0;cursor:default}
+#editor-markdown-wrap{display:none;flex:1;padding:16px 24px 20px;flex-direction:column;gap:12px;background:var(--bg)}
+#editor-markdown-wrap.show{display:flex}
+#editor-markdown-input{width:100%;flex:1;min-height:240px;resize:none;border:1px solid var(--border);border-radius:10px;background:var(--bg-subtle);color:var(--text-em);padding:16px 18px;font-size:15px;line-height:1.7;font-family:var(--font-mono);outline:none}
+#editor-markdown-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(38,139,210,.12)}
+#editor-markdown-preview{flex:1;min-height:240px;overflow:auto;border:1px solid var(--border);border-radius:10px;background:var(--bg-subtle);padding:16px 18px;color:var(--text-em)}
+.markdown-preview{font-size:15px;line-height:1.75;color:var(--text-em)}
+.markdown-preview > :first-child{margin-top:0}
+.markdown-preview > :last-child{margin-bottom:0}
+.markdown-preview h1,.markdown-preview h2,.markdown-preview h3,.markdown-preview h4,.markdown-preview h5,.markdown-preview h6{margin:1em 0 .5em;font-weight:700;color:var(--text-em);line-height:1.25}
+.markdown-preview h1{font-size:2em}.markdown-preview h2{font-size:1.6em}.markdown-preview h3{font-size:1.3em}
+.markdown-preview p,.markdown-preview ul,.markdown-preview ol,.markdown-preview blockquote,.markdown-preview pre,.markdown-preview table{margin:0 0 1em}
+.markdown-preview ul,.markdown-preview ol{padding-left:1.5em}
+.markdown-preview blockquote{padding-left:14px;border-left:4px solid var(--accent);color:var(--text);background:rgba(38,139,210,.05);border-radius:0 6px 6px 0}
+.markdown-preview code{font-family:var(--font-mono);background:rgba(147,161,161,.18);padding:.15em .45em;border-radius:5px;font-size:.92em}
+.markdown-preview pre{background:#f6f2e8;border:1px solid var(--border);padding:12px 14px;border-radius:8px;overflow:auto}
+.markdown-preview pre code{background:none;padding:0}
+.markdown-preview a{color:var(--accent)}
+.markdown-preview img{max-width:100%;border-radius:8px;display:block;margin:8px 0}
+.markdown-preview hr{border:none;border-top:1px solid var(--border);margin:1.2em 0}
+.markdown-preview table{width:100%;border-collapse:collapse;border:1px solid var(--border)}
+.markdown-preview th,.markdown-preview td{border:1px solid var(--border);padding:.5em .7em;text-align:left}
+.markdown-preview strong{font-weight:700}
+.markdown-preview mjx-container[display="true"],.markdown-preview .MathJax_Display,.markdown-preview .mjx-container{display:block!important;max-width:100%;margin:1em auto;text-align:center;overflow-x:auto;overflow-y:hidden;vertical-align:middle}
+.markdown-preview .mjx-container > svg{display:block;margin:0 auto}
+.markdown-preview em{font-style:italic}
+.markdown-preview > .katex-display { margin: 0.8em 0; overflow-x: auto; }
 /* collapsed base64 image pill */
 .b64-img-pill{display:inline-flex;align-items:center;gap:6px;background:var(--bg-subtle);border:1px solid var(--border);border-radius:20px;padding:3px 10px;font-size:12px;color:var(--text-dim);cursor:default;margin:2px;user-select:none;vertical-align:middle}
 .b64-img-pill svg{flex-shrink:0}
@@ -258,16 +297,6 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--text);min-heigh
 /* ── Toasts ── */
 #toast-root{position:fixed;bottom:22px;right:22px;z-index:400;display:flex;flex-direction:column;gap:7px;align-items:flex-end;pointer-events:none}
 .toast{background:var(--base02);color:var(--base3);padding:9px 15px;border-radius:var(--radius);font-size:13px;box-shadow:0 4px 20px rgba(0,0,0,.25);animation:toast-in .2s ease both;pointer-events:auto;display:flex;align-items:center;gap:7px;max-width:280px}
-#settings-modal{position:fixed;inset:0;z-index:600;background:rgba(0,43,54,.55);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center}
-#settings-modal.open{display:flex}
-#settings-panel{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-hover);width:min(560px,calc(100% - 32px));padding:22px 24px;animation:panel-in .18s ease both}
-#settings-panel h3{font-size:17px;color:var(--text-em);margin-bottom:7px}
-#settings-panel p{font-size:13px;color:var(--text-dim);line-height:1.5;margin-bottom:14px}
-#storage-path-input{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg-subtle);color:var(--text);font:13px var(--font-mono);outline:none}
-#storage-path-input:focus{border-color:var(--accent)}
-#settings-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
-#settings-actions button{padding:7px 14px;border:1px solid var(--border);border-radius:7px;background:var(--bg-subtle);color:var(--text-em);font:13px var(--font-ui);cursor:pointer}
-#settings-save-btn{background:var(--accent)!important;color:#fff!important;border-color:var(--accent)!important}
 .toast.success{border-left:3px solid var(--green)}
 .toast.info{border-left:3px solid var(--blue)}
 .toast.error{border-left:3px solid var(--red)}
@@ -292,6 +321,21 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--text);min-heigh
   #cards-grid.view-grid{grid-template-columns:1fr}
 }
 </style>
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+      processEscapes: true,
+      processEnvironments: true,
+      packages: {'[+]': ['ams', 'newcommand', 'color']}
+    },
+    svg: { fontCache: 'global' },
+    startup: { typeset: false }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
 
@@ -438,6 +482,7 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--text);min-heigh
       <input id="editor-title-input" type="text" placeholder="Title (optional)…">
       <select id="editor-type-select">
         <option value="text">Text / Rich</option>
+        <option value="markdown">Markdown</option>
         <option value="link">Link</option>
         <option value="image">Image URL</option>
       </select>
@@ -487,8 +532,6 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--text);min-heigh
       <div class="tb-group">
         <button class="tbr" id="tb-link-btn" title="Insert/edit link">&#128279;</button>
         <button class="tbr" id="tb-img-btn" title="Insert image by URL">&#128247;</button>
-        <button class="tbr" id="tb-file-btn" title="Attach file">&#128193;</button>
-        <input id="tb-file-input" type="file" hidden>
         <button class="tbr" id="tb-hr-btn" title="Horizontal rule">&#8213;</button>
       </div>
       <div class="tb-group">
@@ -513,6 +556,10 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--text);min-heigh
     <!-- Editable content -->
     <div id="editor-content-wrap">
       <div id="editor-body" contenteditable="true" data-placeholder="Start typing, paste, or drag content here…" spellcheck="true"></div>
+      <div id="editor-markdown-wrap">
+        <textarea id="editor-markdown-input" placeholder="Write Markdown here…\n\nExamples:\n# Title\n**bold**\n*italic*\n> quote\n![Alt](https://...)\n$E = mc^2$\n$$\n\int_0^1 x^2 dx\n$$"></textarea>
+        <div id="editor-markdown-preview" class="markdown-preview"></div>
+      </div>
     </div>
 
     <!-- Footer -->
@@ -547,14 +594,41 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--text);min-heigh
    Tauri JSON storage — persisted by the Rust backend
    ══════════════════════════════════════════════════════ */
 const invoke=window.__TAURI__?.core?.invoke;
-let saveitData={items:[],folders:[]};
 let storagePath=localStorage.getItem('saveit.storagePath')||'';
+let saveitData={items:[],folders:[]};
 async function openDB(){
   if(!invoke)throw new Error('SaveIt must be run as a Tauri desktop app');
   if(!storagePath)storagePath=await invoke('get_default_storage_path');
   const data=await invoke('load_data',{storagePath});
   saveitData={items:Array.isArray(data?.items)?data.items:[],folders:Array.isArray(data?.folders)?data.folders:[]};
+  const pathInput=document.getElementById('storage-path-input');
+  if(pathInput)pathInput.value=storagePath;
 }
+const settingsModal=document.getElementById('settings-modal');
+const settingsPathInput=document.getElementById('storage-path-input');
+const settingsSaveBtn=document.getElementById('settings-save-btn');
+const settingsCancelBtn=document.getElementById('settings-cancel-btn');
+async function openSettings(){
+  const defaultPath=storagePath||await invoke('get_default_storage_path');
+  settingsPathInput.value=storagePath||defaultPath;
+  settingsModal.classList.add('open');
+}
+function closeSettings(){settingsModal.classList.remove('open')}
+document.getElementById('settings-btn').addEventListener('click',openSettings);
+settingsCancelBtn.addEventListener('click',closeSettings);
+settingsSaveBtn.addEventListener('click',async()=>{
+  const target=settingsPathInput.value.trim();
+  if(!target){toast('Choose a storage folder','error');return}
+  try{
+    const fromPath=storagePath||await invoke('get_default_storage_path');
+    await invoke('migrate_storage',{fromPath,toPath:target});
+    storagePath=target;
+    localStorage.setItem('saveit.storagePath',target);
+    closeSettings();
+    window.location.reload();
+  }catch(error){toast(error?.toString?.()||'Could not move storage location','error')}
+});
+settingsModal.addEventListener('click',e=>{if(e.target===settingsModal)closeSettings()});
 const persist=()=>invoke('save_data',{storagePath,data:saveitData});
 const dbGetAll=async()=>saveitData.items;
 const dbPut=async item=>{const idx=saveitData.items.findIndex(i=>i.id===item.id);if(idx>=0)saveitData.items[idx]=item;else saveitData.items.push(item);await persist()};
@@ -592,6 +666,9 @@ const fvPrev=document.getElementById('fv-prev');
 const fvNext=document.getElementById('fv-next');
 const editorModal=document.getElementById('editor-modal');
 const editorBody=document.getElementById('editor-body');
+const editorMarkdownWrap=document.getElementById('editor-markdown-wrap');
+const editorMarkdownInput=document.getElementById('editor-markdown-input');
+const editorMarkdownPreview=document.getElementById('editor-markdown-preview');
 const editorTitleInput=document.getElementById('editor-title-input');
 const editorTypeSelect=document.getElementById('editor-type-select');
 const editorToolbar=document.getElementById('editor-toolbar');
@@ -619,9 +696,6 @@ const confirmModal=document.getElementById('confirm-modal');
 const confirmTitle=document.getElementById('confirm-title');
 const confirmMsg=document.getElementById('confirm-msg');
 const confirmActions=document.getElementById('confirm-actions');
-const settingsModal=document.getElementById('settings-modal');
-const settingsPathInput=document.getElementById('storage-path-input');
-const settingsSaveBtn=document.getElementById('settings-save-btn');
 
 /* ══ Utilities ══ */
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
@@ -639,16 +713,41 @@ function openExternal(url){
   if(window.__TAURI__?.opener?.openUrl)return window.__TAURI__.opener.openUrl(url);
   window.open(url,'_blank','noopener,noreferrer');
 }
-function openStoredFile(path){
-  return invoke('open_file',{storagePath,path}).catch(error=>toast(String(error),'error'));
-}
 document.addEventListener('click',e=>{
-  const storedFile=e.target.closest?.('[data-saveit-file-path]');
-  if(storedFile){e.preventDefault();openStoredFile(storedFile.dataset.saveitFilePath);return}
   const link=e.target.closest?.('a[target="_blank"]');
   if(link&&isURL(link.href)){e.preventDefault();openExternal(link.href)}
 });
 function stripHTML(h){const t=document.createElement('div');t.innerHTML=h;return t.textContent||''}
+function stripMarkdown(markdown){
+  return String(markdown || '')
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/`([^`]+)`/g, '$1')
+    .replace(/!\[([^\]]*)\]\([^\)]+\)/g, '$1')
+    .replace(/\[(.*?)\]\((https?:\/\/[^)]+)\)/g, '$1')
+    .replace(/[*_>#-]+/g, ' ')
+    .replace(/#+\s*/g, '')
+    .replace(/\r\n/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .replace(/\$\$([\s\S]*?)\$\$/g, ' ')
+    .replace(/\$([^$]+)\$/g, ' ')
+    .trim();
+}
+function renderMarkdownPreview(markdown){
+  const source=String(markdown||'').trim();
+  if(!source){
+    editorMarkdownPreview.innerHTML='<p style="color:var(--text-dim)">Preview updates as you type…</p>';
+    return;
+  }
+  const prepared = source
+    .replace(/(\n|^)\$\$([\s\S]+?)\$\$/g, (_, prefix, body) => `${prefix}\n\n$$\n${body.trim()}\n$$\n\n`)
+    .replace(/\r\n/g, '\n');
+  const rawHtml = typeof marked !== 'undefined' ? marked.parse(prepared, { gfm: true, breaks: true }) : prepared.replace(/\n/g, '<br>');
+  editorMarkdownPreview.innerHTML = sanitizeHTML(rawHtml);
+  if(window.MathJax && typeof window.MathJax.typesetPromise === 'function'){
+    window.MathJax.typesetPromise([editorMarkdownPreview]).catch(()=>{});
+    setTimeout(()=>window.MathJax.typesetPromise([editorMarkdownPreview]).catch(()=>{}), 25);
+  }
+}
 function toast(msg,type='success',dur=2800){
   const root=document.getElementById('toast-root');
   const el=document.createElement('div');
@@ -706,7 +805,7 @@ function sanitizeHTML(html,opts={}){
           child.replaceWith(frag);
         } else {
           // Sanitize attributes
-            const keep=['class','id','data-saveit-file-path'];
+          const keep=['class','id'];
           const keepIfSafe=['href','src','alt','title','width','height','colspan','rowspan','type','start'];
           Array.from(child.attributes).forEach(attr=>{
             const n=attr.name.toLowerCase();
@@ -781,8 +880,6 @@ async function saveItem(item){
   toast(idx>=0?'Updated!':'Saved!','success');
 }
 
-function foldersForNewItem(){return activeFolderId?[activeFolderId]:[]}
-
 function extractLinkTitle(html,url){
   if(!html)return url;
   const m=html.match(/>([^<]{2,80})</);
@@ -793,23 +890,20 @@ async function processRawContent(html,plain,files){
   // 1. Files
   if(files&&files.length){
     for(const f of files){
-      const stored=await storeBrowserFile(f);
       if(f.type.startsWith('image/')){
         const reader=new FileReader();
         reader.onload=async ev=>{
-          await saveItem({id:uid(),type:'image',data:ev.target.result,path:stored.path,filename:f.name,folders:foldersForNewItem(),savedAt:Date.now()});
+          await saveItem({id:uid(),type:'image',data:ev.target.result,filename:f.name,folders:[],savedAt:Date.now()});
         };
         reader.readAsDataURL(f);
-      } else {
-        await saveItem({id:uid(),type:'file',path:stored.path,filename:f.name,mime:f.type||'application/octet-stream',size:f.size,folders:foldersForNewItem(),savedAt:Date.now()});
+        return true;
       }
     }
-    return true;
   }
   const textTrimmed=(plain||'').trim();
   // 2. Pure URL
   if(!html&&isURL(textTrimmed)){
-    await saveItem({id:uid(),type:'link',url:textTrimmed,title:textTrimmed,folders:foldersForNewItem(),savedAt:Date.now()});
+    await saveItem({id:uid(),type:'link',url:textTrimmed,title:textTrimmed,folders:[],savedAt:Date.now()});
     return true;
   }
   // 3. HTML containing rich content
@@ -819,38 +913,23 @@ async function processRawContent(html,plain,files){
     const anchors=div.querySelectorAll('a');
     const imgSrc=(()=>{const img=div.querySelector('img');return img?img.src:null})();
     if(imgSrc&&/\.(png|jpg|jpeg|gif|webp|svg|avif)(\?.*)?$/i.test(imgSrc)&&stripHTML(html).trim().length<20){
-      await saveItem({id:uid(),type:'image',src:imgSrc,folders:foldersForNewItem(),savedAt:Date.now()});
+      await saveItem({id:uid(),type:'image',src:imgSrc,folders:[],savedAt:Date.now()});
       return true;
     }
     if(anchors.length===1&&stripHTML(html).trim().length<100&&isURL(anchors[0].href)){
-      await saveItem({id:uid(),type:'link',url:anchors[0].href,title:stripHTML(html).trim()||anchors[0].href,folders:foldersForNewItem(),savedAt:Date.now()});
+      await saveItem({id:uid(),type:'link',url:anchors[0].href,title:stripHTML(html).trim()||anchors[0].href,folders:[],savedAt:Date.now()});
       return true;
     }
     // Rich text — sanitize preserving colors
     const cleanHtml=sanitizeHTML(html);
-    await saveItem({id:uid(),type:'text',html:cleanHtml,plain:plain||stripHTML(cleanHtml),folders:foldersForNewItem(),savedAt:Date.now()});
+    await saveItem({id:uid(),type:'text',html:cleanHtml,plain:plain||stripHTML(cleanHtml),folders:[],savedAt:Date.now()});
     return true;
   }
   if(textTrimmed){
-    await saveItem({id:uid(),type:'text',plain:textTrimmed,folders:foldersForNewItem(),savedAt:Date.now()});
+    await saveItem({id:uid(),type:'text',plain:textTrimmed,folders:[],savedAt:Date.now()});
     return true;
   }
   return false;
-}
-
-async function storeBrowserFile(file){
-  const dataUrl=await fileAsDataUrl(file);
-  const stored=await invoke('store_file',{storagePath,filename:file.name,contents:String(dataUrl).split(',')[1]||''});
-  return stored;
-}
-
-function fileAsDataUrl(file){
-  return new Promise((resolve,reject)=>{
-    const reader=new FileReader();
-    reader.onload=()=>resolve(reader.result);
-    reader.onerror=()=>reject(reader.error||new Error('Could not read file'));
-    reader.readAsDataURL(file);
-  });
 }
 
 /* ══ Drop handler ══ */
@@ -866,9 +945,8 @@ async function processDrop(e){
 
 /* ══ Paste (Ctrl+V) — save immediately like a drop ══ */
 document.addEventListener('paste',async e=>{
-  // Let native inputs and editable regions handle their own paste.
-  const activeElement=document.activeElement;
-  if(activeElement?.matches('input,textarea,select,[contenteditable="true"]')||activeElement?.isContentEditable)return;
+  // Don't intercept paste inside the editor
+  if(editorModal.classList.contains('open'))return;
   e.preventDefault();
   const cd=e.clipboardData;
   if(!cd)return;
@@ -882,7 +960,7 @@ document.addEventListener('paste',async e=>{
       if(f){
         const reader=new FileReader();
         reader.onload=async ev=>{
-          await saveItem({id:uid(),type:'image',data:ev.target.result,filename:'clipboard-image.png',folders:foldersForNewItem(),savedAt:Date.now()});
+          await saveItem({id:uid(),type:'image',data:ev.target.result,filename:'clipboard-image.png',folders:[],savedAt:Date.now()});
         };
         reader.readAsDataURL(f);
         return;
@@ -900,7 +978,7 @@ function applyFilters(){
   let items=[...allItems];
   items.sort((a,b)=>sortAsc?a.savedAt-b.savedAt:b.savedAt-a.savedAt);
   if(activeFolderId)items=items.filter(i=>(i.folders||[]).includes(activeFolderId));
-  if(activeFilter!=='all')items=items.filter(i=>i.type===activeFilter);
+  if(activeFilter!=='all')items=items.filter(i=>activeFilter==='text' ? (i.type==='text'||i.type==='markdown') : i.type===activeFilter);
   if(searchQ){
     const q=searchQ.toLowerCase();
     items=items.filter(i=>((i.plain||'')+(i.url||'')+(i.title||'')+(i.filename||'')+(stripHTML(i.html||''))).toLowerCase().includes(q));
@@ -957,8 +1035,8 @@ function buildCard(item,idx){
   const snip=document.createElement('div');
   snip.className='card-snippet';
 
-  if(item.type==='text'){
-    const raw=item.plain||stripHTML(item.html||'');
+  if(item.type==='text' || item.type==='markdown'){
+    const raw=item.plain||stripMarkdown(item.markdown||'')||stripHTML(item.html||'');
     title.textContent=(item.title||raw.slice(0,60)||'(empty)');
     snip.textContent=raw.slice(0,200);
     body.appendChild(title);body.appendChild(snip);
@@ -967,11 +1045,6 @@ function buildCard(item,idx){
     const urlEl=document.createElement('div');
     urlEl.className='card-link-url';urlEl.textContent=item.url;
     body.appendChild(title);body.appendChild(urlEl);
-  } else if(item.type==='file'){
-    title.textContent=item.title||item.filename||'File';
-    const fileEl=document.createElement('div');
-    fileEl.className='card-link-url';fileEl.textContent=item.filename||item.path;
-    body.appendChild(title);body.appendChild(fileEl);
   } else {
     title.textContent=item.title||item.filename||'Image';
     body.appendChild(title);
@@ -1259,17 +1332,16 @@ function renderFullview(){
       <a class="fv-link-url" href="${escHTML(item.url)}" target="_blank" rel="noopener">${escHTML(item.url)}</a>
       <a href="${escHTML(item.url)}" target="_blank" rel="noopener" style="display:inline-block;margin-top:6px;padding:6px 14px;background:var(--accent);color:#fff;border-radius:6px;font-size:13px;text-decoration:none">Open ↗</a>`;
     fvContent.appendChild(box);
-  } else if(item.type==='file'){
-    const box=document.createElement('div');box.className='fv-link-box';
-    box.innerHTML=`<div class="fv-link-title">${escHTML(item.filename||'Saved file')}</div><div class="fv-link-url">${escHTML(item.path)}</div>`;
-    const open=document.createElement('button');
-    open.className='fv-action-btn';open.textContent='Open file';open.style.alignSelf='flex-start';
-    open.addEventListener('click',()=>openStoredFile(item.path));
-    box.appendChild(open);fvContent.appendChild(box);
   } else {
     const wrapper=document.createElement('div');
     wrapper.className='fv-text-body';
-    if(item.html){
+    if(item.type==='markdown'){
+      const markdownHtml = typeof marked !== 'undefined' ? marked.parse(item.markdown || '') : (item.markdown||'').replace(/\n/g,'<br>');
+      wrapper.innerHTML = sanitizeHTML(markdownHtml);
+      if(window.MathJax && typeof window.MathJax.typesetPromise === 'function'){
+        window.MathJax.typesetPromise([wrapper]).catch(()=>{});
+      }
+    } else if(item.html){
       wrapper.innerHTML=sanitizeHTML(item.html);
     } else {
       wrapper.style.whiteSpace='pre-wrap';
@@ -1292,7 +1364,7 @@ document.getElementById('fv-edit-btn').addEventListener('click',()=>{
 document.getElementById('fv-copy-btn').addEventListener('click',async()=>{
   const item=filteredItems[fvIndex];if(!item)return;
   try{
-    if(item.type==='text')await navigator.clipboard.writeText(item.plain||stripHTML(item.html||''));
+    if(item.type==='text' || item.type==='markdown')await navigator.clipboard.writeText(item.plain || item.markdown || stripHTML(item.html||''));
     else if(item.type==='link')await navigator.clipboard.writeText(item.url);
     toast('Copied!','success');
   }catch{toast('Copy failed','error')}
@@ -1361,6 +1433,11 @@ function openEditor(id){
   if(!item){
     // new blank
     editorBody.innerHTML='';
+    editorMarkdownInput.value='';
+    renderMarkdownPreview('');
+  } else if(item.type==='markdown'){
+    editorMarkdownInput.value=item.markdown||'';
+    renderMarkdownPreview(item.markdown||'');
   } else if(item.type==='text'){
     // collapse base64 images as pills in the editor
     editorBody.innerHTML=sanitizeHTML(item.html||`<p>${escHTML(item.plain||'')}</p>`,{collapseBase64:true});
@@ -1380,13 +1457,20 @@ function openEditor(id){
 
 function updateEditorUI(){
   const type=editorTypeSelect.value;
-  editorToolbar.style.display=type==='text'?'flex':'none';
+  const markdownMode = type === 'markdown';
+  editorToolbar.style.display=(type==='text' ? 'flex':'none');
+  editorBody.style.display=(markdownMode ? 'none' : 'block');
+  editorMarkdownWrap.classList.toggle('show', markdownMode);
   editorUrlRow.style.display=(type==='link'||type==='image')?'flex':'none';
   editorUrlInput.placeholder=type==='link'?'https://…':'Image URL…';
   document.getElementById('ed-discard-btn').style.display=editingId?'block':'none';
+  if(markdownMode){
+    renderMarkdownPreview(editorMarkdownInput.value);
+  }
 }
 
 editorTypeSelect.addEventListener('change',updateEditorUI);
+editorMarkdownInput.addEventListener('input',()=>renderMarkdownPreview(editorMarkdownInput.value));
 
 function closeEditor(){
   editorModal.classList.remove('open');
@@ -1413,24 +1497,43 @@ document.getElementById('ed-save-btn').addEventListener('click',async()=>{
   const type=editorTypeSelect.value;
   const title=editorTitleInput.value.trim();
 
+  if(type==='markdown'){
+    const markdownValue=document.getElementById('editor-markdown-input').value;
+    const cleanMarkdown=(markdownValue||'').trim();
+    if(!cleanMarkdown){toast('Nothing to save','error');return}
+    const existing=editingId?allItems.find(i=>i.id===editingId):null;
+    await saveItem({
+      id:editingId||uid(),
+      type:'markdown',
+      markdown:cleanMarkdown,
+      plain:stripMarkdown(cleanMarkdown),
+      title:title||stripMarkdown(cleanMarkdown).slice(0,60),
+      folders:existing?(existing.folders||[]):[],
+      savedAt:existing?existing.savedAt:Date.now(),
+      updatedAt:Date.now()
+    });
+    closeEditor();
+    return;
+  }
+
   if(type==='link'){
     const url=editorUrlInput.value.trim();
     if(!url){toast('Enter a URL','error');return}
     const linkTitle=title||editorBody.textContent.trim()||url;
-    await saveItem({id:editingId||uid(),type:'link',url,title:linkTitle,folders:editingId?(allItems.find(i=>i.id===editingId)?.folders||[]):foldersForNewItem(),savedAt:editingId?allItems.find(i=>i.id===editingId)?.savedAt||Date.now():Date.now(),updatedAt:Date.now()});
+    await saveItem({id:editingId||uid(),type:'link',url,title:linkTitle,folders:editingId?(allItems.find(i=>i.id===editingId)?.folders||[]):[],savedAt:editingId?allItems.find(i=>i.id===editingId)?.savedAt||Date.now():Date.now(),updatedAt:Date.now()});
     closeEditor();return;
   }
 
   if(type==='image'){
     const url=editorUrlInput.value.trim();
     if(url){
-      await saveItem({id:editingId||uid(),type:'image',src:url,title:title||url,folders:editingId?(allItems.find(i=>i.id===editingId)?.folders||[]):foldersForNewItem(),savedAt:editingId?allItems.find(i=>i.id===editingId)?.savedAt||Date.now():Date.now(),updatedAt:Date.now()});
+      await saveItem({id:editingId||uid(),type:'image',src:url,title:title||url,folders:editingId?(allItems.find(i=>i.id===editingId)?.folders||[]):[],savedAt:editingId?allItems.find(i=>i.id===editingId)?.savedAt||Date.now():Date.now(),updatedAt:Date.now()});
       closeEditor();return;
     }
     // image in body
     const imgEl=editorBody.querySelector('img');
     if(imgEl){
-      await saveItem({id:editingId||uid(),type:'image',data:imgEl.src,title:title||'Image',folders:editingId?(allItems.find(i=>i.id===editingId)?.folders||[]):foldersForNewItem(),savedAt:editingId?allItems.find(i=>i.id===editingId)?.savedAt||Date.now():Date.now(),updatedAt:Date.now()});
+      await saveItem({id:editingId||uid(),type:'image',data:imgEl.src,title:title||'Image',folders:editingId?(allItems.find(i=>i.id===editingId)?.folders||[]):[],savedAt:editingId?allItems.find(i=>i.id===editingId)?.savedAt||Date.now():Date.now(),updatedAt:Date.now()});
       closeEditor();return;
     }
     toast('No image to save','error');return;
@@ -1449,7 +1552,7 @@ document.getElementById('ed-save-btn').addEventListener('click',async()=>{
     html:cleanHtml,
     plain,
     title:title||plain.slice(0,60),
-    folders:existing?(existing.folders||[]):foldersForNewItem(),
+    folders:existing?(existing.folders||[]):[],
     savedAt:existing?existing.savedAt:Date.now(),
     updatedAt:Date.now()
   });
@@ -1490,8 +1593,13 @@ editorBody.addEventListener('drop',async e=>{
     }
   };
 
-  if(files.length){
-    for(const file of files)await insertFileAtSelection(file,range);
+  if(files.length&&files[0].type.startsWith('image/')){
+    const f=files[0];
+    const reader=new FileReader();
+    reader.onload=async ev=>{
+      await insertHTML(`<img src="${ev.target.result}" style="max-width:100%">`);
+    };
+    reader.readAsDataURL(f);
     return;
   }
   if(html){await insertHTML(html);return}
@@ -1578,26 +1686,6 @@ document.getElementById('tb-img-btn').addEventListener('mousedown',e=>{
   editorBody.focus();
 });
 
-document.getElementById('tb-file-btn').addEventListener('mousedown',e=>{
-  e.preventDefault();document.getElementById('tb-file-input').click();
-});
-document.getElementById('tb-file-input').addEventListener('change',async e=>{
-  for(const file of e.target.files||[]){await insertFileAtSelection(file)}
-  e.target.value='';editorBody.focus();
-});
-
-async function insertFileAtSelection(file,insertionRange=null){
-  const stored=await storeBrowserFile(file);
-  const selection=window.getSelection();
-  const range=insertionRange|| (selection?.rangeCount?selection.getRangeAt(0).cloneRange():null);
-  const label=escHTML(file.name);
-  const markup=file.type.startsWith('image/')
-    ?`<img src="${escHTML(await fileAsDataUrl(file))}" data-saveit-file-path="${escHTML(stored.path)}" style="max-width:100%">`
-    :`<a href="#" data-saveit-file-path="${escHTML(stored.path)}">${label}</a>`;
-  if(range){selection.removeAllRanges();selection.addRange(range)}
-  document.execCommand('insertHTML',false,markup);
-}
-
 /* Toolbar state update */
 function updateToolbarState(){
   document.querySelectorAll('.tbr[data-cmd]').forEach(btn=>{
@@ -1653,30 +1741,6 @@ document.querySelectorAll('.filter-pill').forEach(pill=>{
 });
 searchEl.addEventListener('input',()=>{searchQ=searchEl.value.trim();applyFilters()});
 
-document.getElementById('settings-btn').addEventListener('click',()=>{
-  settingsPathInput.value=storagePath;
-  settingsModal.classList.add('open');
-  settingsPathInput.focus();
-});
-document.getElementById('settings-cancel-btn').addEventListener('click',()=>settingsModal.classList.remove('open'));
-settingsModal.addEventListener('click',e=>{if(e.target===settingsModal)settingsModal.classList.remove('open')});
-settingsSaveBtn.addEventListener('click',async()=>{
-  const newPath=settingsPathInput.value.trim();
-  if(!newPath){toast('Enter a storage path','error');return}
-  if(newPath===storagePath){settingsModal.classList.remove('open');return}
-  settingsSaveBtn.disabled=true;
-  settingsSaveBtn.textContent='Moving...';
-  try{
-    await invoke('migrate_storage',{fromPath:storagePath,toPath:newPath});
-    localStorage.setItem('saveit.storagePath',newPath);
-    location.reload();
-  }catch(error){
-    toast(String(error),'error');
-    settingsSaveBtn.disabled=false;
-    settingsSaveBtn.textContent='Move and reload';
-  }
-});
-
 /* ══ Global keyboard ══ */
 document.addEventListener('keydown',e=>{
   const inEditor=editorModal.classList.contains('open');
@@ -1690,7 +1754,6 @@ document.addEventListener('keydown',e=>{
     if(inConfirm)closeConfirm();
     else if(inEditor)closeEditor();
     else if(inFV)closeFullview();
-    else if(settingsModal.classList.contains('open'))settingsModal.classList.remove('open');
     else if(selectedIds.size){selectedIds.clear();render();updateSelectionBar()}
   }
   if((e.ctrlKey||e.metaKey)&&e.key==='n'&&!inEditor){e.preventDefault();openEditor(null)}

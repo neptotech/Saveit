@@ -38,6 +38,19 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--text);min-heigh
 .tb-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
 #item-count{font-size:12px;color:var(--text-dim);white-space:nowrap;min-width:48px;text-align:right}
 
+/* ── Settings modal ── */
+#settings-modal{position:fixed;inset:0;z-index:420;background:rgba(0,43,54,.55);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center}
+#settings-modal.open{display:flex}
+#settings-panel{background:var(--bg);border:1px solid var(--border);box-shadow:var(--shadow-hover);border-radius:var(--radius-lg);max-width:460px;width:min(92vw,460px);padding:22px 20px;display:flex;flex-direction:column;gap:12px;animation:panel-in .18s ease both}
+#settings-panel h3{font-size:18px;color:var(--text-em)}
+#settings-panel p{font-size:13.5px;line-height:1.6;color:var(--text);margin-bottom:4px}
+#storage-path-input{width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:7px;background:var(--bg-subtle);color:var(--text-em);font-size:13.5px;font-family:var(--font-ui);outline:none}
+#storage-path-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(38,139,210,.12)}
+#settings-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:6px}
+#settings-cancel-btn,#settings-save-btn{padding:8px 12px;border-radius:6px;border:1px solid var(--border);cursor:pointer;font-size:13px;font-family:var(--font-ui)}
+#settings-cancel-btn{background:var(--bg-subtle);color:var(--text-em)}
+#settings-save-btn{background:var(--accent);color:#fff;border-color:var(--accent)}
+
 /* ── Drop overlay ── */
 #drop-overlay{position:fixed;inset:0;z-index:200;background:rgba(38,139,210,.08);backdrop-filter:blur(2px);border:3px dashed var(--accent);display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px;pointer-events:none}
 #drop-overlay.active{display:flex}
@@ -236,6 +249,32 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--text);min-heigh
 #editor-body{flex:1;padding:24px 32px;outline:none;font-size:16px;line-height:1.78;color:var(--text-em);min-height:300px;word-break:break-word}
 #editor-body:empty::before{content:attr(data-placeholder);color:var(--text-dim);pointer-events:none}
 #editor-body img{max-width:100%;border-radius:6px;display:block;margin:8px 0;cursor:default}
+#editor-markdown-wrap{display:none;flex:1;padding:16px 24px 20px;flex-direction:column;gap:12px;background:var(--bg)}
+#editor-markdown-wrap.show{display:flex}
+#editor-markdown-input{width:100%;flex:1;min-height:240px;resize:none;border:1px solid var(--border);border-radius:10px;background:var(--bg-subtle);color:var(--text-em);padding:16px 18px;font-size:15px;line-height:1.7;font-family:var(--font-mono);outline:none}
+#editor-markdown-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(38,139,210,.12)}
+#editor-markdown-preview{flex:1;min-height:240px;overflow:auto;border:1px solid var(--border);border-radius:10px;background:var(--bg-subtle);padding:16px 18px;color:var(--text-em)}
+.markdown-preview{font-size:15px;line-height:1.75;color:var(--text-em)}
+.markdown-preview > :first-child{margin-top:0}
+.markdown-preview > :last-child{margin-bottom:0}
+.markdown-preview h1,.markdown-preview h2,.markdown-preview h3,.markdown-preview h4,.markdown-preview h5,.markdown-preview h6{margin:1em 0 .5em;font-weight:700;color:var(--text-em);line-height:1.25}
+.markdown-preview h1{font-size:2em}.markdown-preview h2{font-size:1.6em}.markdown-preview h3{font-size:1.3em}
+.markdown-preview p,.markdown-preview ul,.markdown-preview ol,.markdown-preview blockquote,.markdown-preview pre,.markdown-preview table{margin:0 0 1em}
+.markdown-preview ul,.markdown-preview ol{padding-left:1.5em}
+.markdown-preview blockquote{padding-left:14px;border-left:4px solid var(--accent);color:var(--text);background:rgba(38,139,210,.05);border-radius:0 6px 6px 0}
+.markdown-preview code{font-family:var(--font-mono);background:rgba(147,161,161,.18);padding:.15em .45em;border-radius:5px;font-size:.92em}
+.markdown-preview pre{background:#f6f2e8;border:1px solid var(--border);padding:12px 14px;border-radius:8px;overflow:auto}
+.markdown-preview pre code{background:none;padding:0}
+.markdown-preview a{color:var(--accent)}
+.markdown-preview img{max-width:100%;border-radius:8px;display:block;margin:8px 0}
+.markdown-preview hr{border:none;border-top:1px solid var(--border);margin:1.2em 0}
+.markdown-preview table{width:100%;border-collapse:collapse;border:1px solid var(--border)}
+.markdown-preview th,.markdown-preview td{border:1px solid var(--border);padding:.5em .7em;text-align:left}
+.markdown-preview strong{font-weight:700}
+.markdown-preview mjx-container[display="true"],.markdown-preview .MathJax_Display,.markdown-preview .mjx-container{display:block!important;max-width:100%;margin:1em auto;text-align:center;overflow-x:auto;overflow-y:hidden;vertical-align:middle}
+.markdown-preview .mjx-container > svg{display:block;margin:0 auto}
+.markdown-preview em{font-style:italic}
+.markdown-preview > .katex-display { margin: 0.8em 0; overflow-x: auto; }
 /* collapsed base64 image pill */
 .b64-img-pill{display:inline-flex;align-items:center;gap:6px;background:var(--bg-subtle);border:1px solid var(--border);border-radius:20px;padding:3px 10px;font-size:12px;color:var(--text-dim);cursor:default;margin:2px;user-select:none;vertical-align:middle}
 .b64-img-pill svg{flex-shrink:0}
@@ -282,6 +321,21 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--text);min-heigh
   #cards-grid.view-grid{grid-template-columns:1fr}
 }
 </style>
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+      processEscapes: true,
+      processEnvironments: true,
+      packages: {'[+]': ['ams', 'newcommand', 'color']}
+    },
+    svg: { fontCache: 'global' },
+    startup: { typeset: false }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
 
@@ -320,9 +374,25 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--text);min-heigh
     <button class="tb-btn" id="btn-list" title="List view">
       <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M5 4h9M5 8h9M5 12h9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="2" cy="4" r="1" fill="currentColor"/><circle cx="2" cy="8" r="1" fill="currentColor"/><circle cx="2" cy="12" r="1" fill="currentColor"/></svg>
     </button>
+    <button class="tb-btn" id="settings-btn" title="Storage settings">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M6.7 1.8h2.6l.5 1.8c.4.2.8.4 1.2.7l1.8-.5 1.3 2.2-1.3 1.3v1.4l1.3 1.3-1.3 2.2-1.8-.5c-.4.3-.8.5-1.2.7l-.5 1.8H6.7l-.5-1.8c-.4-.2-.8-.4-1.2-.7l-1.8.5-1.3-2.2 1.3-1.3V7.3L1.9 6l1.3-2.2 1.8.5c.4-.3.8-.5 1.2-.7l.5-1.8Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><circle cx="8" cy="8" r="2.2" stroke="currentColor" stroke-width="1.2"/></svg>
+      Settings
+    </button>
     <span id="item-count"></span>
   </div>
 </header>
+
+<div id="settings-modal">
+  <div id="settings-panel">
+    <h3>Storage location</h3>
+    <p>SaveIt stores saveit.json and the SaveItFiles folder together. The destination must be new or empty. Existing data will be copied before the app reloads.</p>
+    <input id="storage-path-input" type="text" spellcheck="false">
+    <div id="settings-actions">
+      <button id="settings-cancel-btn">Cancel</button>
+      <button id="settings-save-btn">Move and reload</button>
+    </div>
+  </div>
+</div>
 
 <div id="app-layout">
 <aside id="folder-sidebar">
@@ -412,6 +482,7 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--text);min-heigh
       <input id="editor-title-input" type="text" placeholder="Title (optional)…">
       <select id="editor-type-select">
         <option value="text">Text / Rich</option>
+        <option value="markdown">Markdown</option>
         <option value="link">Link</option>
         <option value="image">Image URL</option>
       </select>
@@ -485,6 +556,10 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--text);min-heigh
     <!-- Editable content -->
     <div id="editor-content-wrap">
       <div id="editor-body" contenteditable="true" data-placeholder="Start typing, paste, or drag content here…" spellcheck="true"></div>
+      <div id="editor-markdown-wrap">
+        <textarea id="editor-markdown-input" placeholder="Write Markdown here…\n\nExamples:\n# Title\n**bold**\n*italic*\n> quote\n![Alt](https://...)\n$E = mc^2$\n$$\n\int_0^1 x^2 dx\n$$"></textarea>
+        <div id="editor-markdown-preview" class="markdown-preview"></div>
+      </div>
     </div>
 
     <!-- Footer -->
@@ -519,13 +594,42 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--text);min-heigh
    Tauri JSON storage — persisted by the Rust backend
    ══════════════════════════════════════════════════════ */
 const invoke=window.__TAURI__?.core?.invoke;
+let storagePath=localStorage.getItem('saveit.storagePath')||'';
 let saveitData={items:[],folders:[]};
 async function openDB(){
   if(!invoke)throw new Error('SaveIt must be run as a Tauri desktop app');
-  const data=await invoke('load_data');
+  if(!storagePath)storagePath=await invoke('get_default_storage_path');
+  const data=await invoke('load_data',{storagePath});
   saveitData={items:Array.isArray(data?.items)?data.items:[],folders:Array.isArray(data?.folders)?data.folders:[]};
+  const pathInput=document.getElementById('storage-path-input');
+  if(pathInput)pathInput.value=storagePath;
 }
-const persist=()=>invoke('save_data',{data:saveitData});
+const settingsModal=document.getElementById('settings-modal');
+const settingsPathInput=document.getElementById('storage-path-input');
+const settingsSaveBtn=document.getElementById('settings-save-btn');
+const settingsCancelBtn=document.getElementById('settings-cancel-btn');
+async function openSettings(){
+  const defaultPath=storagePath||await invoke('get_default_storage_path');
+  settingsPathInput.value=storagePath||defaultPath;
+  settingsModal.classList.add('open');
+}
+function closeSettings(){settingsModal.classList.remove('open')}
+document.getElementById('settings-btn').addEventListener('click',openSettings);
+settingsCancelBtn.addEventListener('click',closeSettings);
+settingsSaveBtn.addEventListener('click',async()=>{
+  const target=settingsPathInput.value.trim();
+  if(!target){toast('Choose a storage folder','error');return}
+  try{
+    const fromPath=storagePath||await invoke('get_default_storage_path');
+    await invoke('migrate_storage',{fromPath,toPath:target});
+    storagePath=target;
+    localStorage.setItem('saveit.storagePath',target);
+    closeSettings();
+    window.location.reload();
+  }catch(error){toast(error?.toString?.()||'Could not move storage location','error')}
+});
+settingsModal.addEventListener('click',e=>{if(e.target===settingsModal)closeSettings()});
+const persist=()=>invoke('save_data',{storagePath,data:saveitData});
 const dbGetAll=async()=>saveitData.items;
 const dbPut=async item=>{const idx=saveitData.items.findIndex(i=>i.id===item.id);if(idx>=0)saveitData.items[idx]=item;else saveitData.items.push(item);await persist()};
 const dbDelete=async id=>{saveitData.items=saveitData.items.filter(item=>item.id!==id);await persist()};
@@ -562,6 +666,9 @@ const fvPrev=document.getElementById('fv-prev');
 const fvNext=document.getElementById('fv-next');
 const editorModal=document.getElementById('editor-modal');
 const editorBody=document.getElementById('editor-body');
+const editorMarkdownWrap=document.getElementById('editor-markdown-wrap');
+const editorMarkdownInput=document.getElementById('editor-markdown-input');
+const editorMarkdownPreview=document.getElementById('editor-markdown-preview');
 const editorTitleInput=document.getElementById('editor-title-input');
 const editorTypeSelect=document.getElementById('editor-type-select');
 const editorToolbar=document.getElementById('editor-toolbar');
@@ -611,6 +718,36 @@ document.addEventListener('click',e=>{
   if(link&&isURL(link.href)){e.preventDefault();openExternal(link.href)}
 });
 function stripHTML(h){const t=document.createElement('div');t.innerHTML=h;return t.textContent||''}
+function stripMarkdown(markdown){
+  return String(markdown || '')
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/`([^`]+)`/g, '$1')
+    .replace(/!\[([^\]]*)\]\([^\)]+\)/g, '$1')
+    .replace(/\[(.*?)\]\((https?:\/\/[^)]+)\)/g, '$1')
+    .replace(/[*_>#-]+/g, ' ')
+    .replace(/#+\s*/g, '')
+    .replace(/\r\n/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .replace(/\$\$([\s\S]*?)\$\$/g, ' ')
+    .replace(/\$([^$]+)\$/g, ' ')
+    .trim();
+}
+function renderMarkdownPreview(markdown){
+  const source=String(markdown||'').trim();
+  if(!source){
+    editorMarkdownPreview.innerHTML='<p style="color:var(--text-dim)">Preview updates as you type…</p>';
+    return;
+  }
+  const prepared = source
+    .replace(/(\n|^)\$\$([\s\S]+?)\$\$/g, (_, prefix, body) => `${prefix}\n\n$$\n${body.trim()}\n$$\n\n`)
+    .replace(/\r\n/g, '\n');
+  const rawHtml = typeof marked !== 'undefined' ? marked.parse(prepared, { gfm: true, breaks: true }) : prepared.replace(/\n/g, '<br>');
+  editorMarkdownPreview.innerHTML = sanitizeHTML(rawHtml);
+  if(window.MathJax && typeof window.MathJax.typesetPromise === 'function'){
+    window.MathJax.typesetPromise([editorMarkdownPreview]).catch(()=>{});
+    setTimeout(()=>window.MathJax.typesetPromise([editorMarkdownPreview]).catch(()=>{}), 25);
+  }
+}
 function toast(msg,type='success',dur=2800){
   const root=document.getElementById('toast-root');
   const el=document.createElement('div');
@@ -841,7 +978,7 @@ function applyFilters(){
   let items=[...allItems];
   items.sort((a,b)=>sortAsc?a.savedAt-b.savedAt:b.savedAt-a.savedAt);
   if(activeFolderId)items=items.filter(i=>(i.folders||[]).includes(activeFolderId));
-  if(activeFilter!=='all')items=items.filter(i=>i.type===activeFilter);
+  if(activeFilter!=='all')items=items.filter(i=>activeFilter==='text' ? (i.type==='text'||i.type==='markdown') : i.type===activeFilter);
   if(searchQ){
     const q=searchQ.toLowerCase();
     items=items.filter(i=>((i.plain||'')+(i.url||'')+(i.title||'')+(i.filename||'')+(stripHTML(i.html||''))).toLowerCase().includes(q));
@@ -898,8 +1035,8 @@ function buildCard(item,idx){
   const snip=document.createElement('div');
   snip.className='card-snippet';
 
-  if(item.type==='text'){
-    const raw=item.plain||stripHTML(item.html||'');
+  if(item.type==='text' || item.type==='markdown'){
+    const raw=item.plain||stripMarkdown(item.markdown||'')||stripHTML(item.html||'');
     title.textContent=(item.title||raw.slice(0,60)||'(empty)');
     snip.textContent=raw.slice(0,200);
     body.appendChild(title);body.appendChild(snip);
@@ -1198,7 +1335,13 @@ function renderFullview(){
   } else {
     const wrapper=document.createElement('div');
     wrapper.className='fv-text-body';
-    if(item.html){
+    if(item.type==='markdown'){
+      const markdownHtml = typeof marked !== 'undefined' ? marked.parse(item.markdown || '') : (item.markdown||'').replace(/\n/g,'<br>');
+      wrapper.innerHTML = sanitizeHTML(markdownHtml);
+      if(window.MathJax && typeof window.MathJax.typesetPromise === 'function'){
+        window.MathJax.typesetPromise([wrapper]).catch(()=>{});
+      }
+    } else if(item.html){
       wrapper.innerHTML=sanitizeHTML(item.html);
     } else {
       wrapper.style.whiteSpace='pre-wrap';
@@ -1221,7 +1364,7 @@ document.getElementById('fv-edit-btn').addEventListener('click',()=>{
 document.getElementById('fv-copy-btn').addEventListener('click',async()=>{
   const item=filteredItems[fvIndex];if(!item)return;
   try{
-    if(item.type==='text')await navigator.clipboard.writeText(item.plain||stripHTML(item.html||''));
+    if(item.type==='text' || item.type==='markdown')await navigator.clipboard.writeText(item.plain || item.markdown || stripHTML(item.html||''));
     else if(item.type==='link')await navigator.clipboard.writeText(item.url);
     toast('Copied!','success');
   }catch{toast('Copy failed','error')}
@@ -1290,6 +1433,11 @@ function openEditor(id){
   if(!item){
     // new blank
     editorBody.innerHTML='';
+    editorMarkdownInput.value='';
+    renderMarkdownPreview('');
+  } else if(item.type==='markdown'){
+    editorMarkdownInput.value=item.markdown||'';
+    renderMarkdownPreview(item.markdown||'');
   } else if(item.type==='text'){
     // collapse base64 images as pills in the editor
     editorBody.innerHTML=sanitizeHTML(item.html||`<p>${escHTML(item.plain||'')}</p>`,{collapseBase64:true});
@@ -1309,13 +1457,20 @@ function openEditor(id){
 
 function updateEditorUI(){
   const type=editorTypeSelect.value;
-  editorToolbar.style.display=type==='text'?'flex':'none';
+  const markdownMode = type === 'markdown';
+  editorToolbar.style.display=(type==='text' ? 'flex':'none');
+  editorBody.style.display=(markdownMode ? 'none' : 'block');
+  editorMarkdownWrap.classList.toggle('show', markdownMode);
   editorUrlRow.style.display=(type==='link'||type==='image')?'flex':'none';
   editorUrlInput.placeholder=type==='link'?'https://…':'Image URL…';
   document.getElementById('ed-discard-btn').style.display=editingId?'block':'none';
+  if(markdownMode){
+    renderMarkdownPreview(editorMarkdownInput.value);
+  }
 }
 
 editorTypeSelect.addEventListener('change',updateEditorUI);
+editorMarkdownInput.addEventListener('input',()=>renderMarkdownPreview(editorMarkdownInput.value));
 
 function closeEditor(){
   editorModal.classList.remove('open');
@@ -1341,6 +1496,25 @@ document.getElementById('ed-discard-btn').addEventListener('click',()=>{
 document.getElementById('ed-save-btn').addEventListener('click',async()=>{
   const type=editorTypeSelect.value;
   const title=editorTitleInput.value.trim();
+
+  if(type==='markdown'){
+    const markdownValue=document.getElementById('editor-markdown-input').value;
+    const cleanMarkdown=(markdownValue||'').trim();
+    if(!cleanMarkdown){toast('Nothing to save','error');return}
+    const existing=editingId?allItems.find(i=>i.id===editingId):null;
+    await saveItem({
+      id:editingId||uid(),
+      type:'markdown',
+      markdown:cleanMarkdown,
+      plain:stripMarkdown(cleanMarkdown),
+      title:title||stripMarkdown(cleanMarkdown).slice(0,60),
+      folders:existing?(existing.folders||[]):[],
+      savedAt:existing?existing.savedAt:Date.now(),
+      updatedAt:Date.now()
+    });
+    closeEditor();
+    return;
+  }
 
   if(type==='link'){
     const url=editorUrlInput.value.trim();
