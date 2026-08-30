@@ -776,6 +776,49 @@ function showConfirm(title,message,buttons){
 }
 function closeConfirm(){confirmModal.classList.remove('open')}
 confirmModal.addEventListener('click',e=>{if(e.target===confirmModal)closeConfirm()});
+function choosePasteFormat(){
+  return new Promise(resolve=>{
+    let settled=false;
+    const finish=format=>{
+      if(settled)return;
+      settled=true;
+      closeConfirm();
+      resolve(format);
+    };
+    confirmTitle.textContent='Paste as rich text or Markdown?';
+    confirmMsg.textContent='This clipboard contains formatted HTML and Markdown syntax. Choose how to save it.';
+    confirmActions.innerHTML='';
+    const richButton=document.createElement('button');
+    richButton.className='confirm-btn primary';richButton.textContent='Paste as Rich text';
+    const markdownButton=document.createElement('button');
+    markdownButton.className='confirm-btn';markdownButton.textContent='Paste as Markdown';
+    richButton.addEventListener('click',()=>finish('html'));
+    markdownButton.addEventListener('click',()=>finish('markdown'));
+    confirmActions.append(richButton,markdownButton);
+    confirmModal.classList.add('open');
+    const handleKey=e=>{
+      if(!confirmModal.classList.contains('open'))return;
+      if(e.key==='Escape'){
+        e.preventDefault();
+        finish('html');
+        return;
+      }
+      if(e.key==='ArrowLeft'||e.key==='ArrowRight'){
+        e.preventDefault();
+        (document.activeElement===richButton?markdownButton:richButton).focus();
+      }
+      if(e.key==='Tab'){
+        e.preventDefault();
+        (document.activeElement===richButton?markdownButton:richButton).focus();
+      }
+    };
+    confirmModal.addEventListener('keydown',handleKey);
+    confirmModal.addEventListener('click',e=>{
+      if(e.target===confirmModal)finish('html');
+    },{once:true});
+    richButton.focus();
+  });
+}
 
 /* ══════════════════════════════════════════════════════
    HTML Sanitizer — preserves colors, bold, italic, links,
@@ -924,12 +967,17 @@ async function processRawContent(html,plain,files){
   }
   const textTrimmed=(plain||'').trim();
   const isMarkdownText=textTrimmed && ((typeof marked!=='undefined' && hasMarkdownTokens(marked.lexer(textTrimmed)))||hasMathDelimiters(textTrimmed));
+  const pasteFormat=html&&isMarkdownText?await choosePasteFormat():'html';
   // 2. Pure URL
   if(!html&&isURL(textTrimmed)){
     await saveItem({id:uid(),type:'link',url:textTrimmed,title:textTrimmed,folders:foldersForNewItem(),savedAt:Date.now()});
     return true;
   }
   // 3. HTML containing rich content
+  if(html&&pasteFormat==='markdown'){
+    await saveItem({id:uid(),type:'markdown',markdown:textTrimmed,plain:stripMarkdown(textTrimmed),folders:foldersForNewItem(),savedAt:Date.now()});
+    return true;
+  }
   if(html){
     // Check for link-dominant drags
     const div=document.createElement('div');div.innerHTML=html;

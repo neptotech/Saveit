@@ -1,6 +1,6 @@
 [package]
 name = "saveit"
-version = "1.0.0"
+version = "2.1.0"
 description = "A durable desktop inbox for anything worth keeping"
 authors = ["SaveIt"]
 edition = "2021"
