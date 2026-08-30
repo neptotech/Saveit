@@ -29,7 +29,7 @@ Built with Rust and Tauri 2. [Thus light weight *8MB* portable app or *2MB insta
 
 ## Download
 
-For Windows, use one of the generated installers from the release assets:
+For Windows, use one of the generated installers from the release assets: [Get it here](https://github.com/neptotech/Saveit/releases/latest/)
 
 - `SaveIt_1.0.0_x64-setup.exe` for the NSIS installer
 - `SaveIt_1.0.0_x64_en-US.msi` for the MSI installer
