@@ -207,7 +207,7 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--text);min-heigh
 #fv-content img{max-width:100%;border-radius:var(--radius);box-shadow:var(--shadow);display:block;margin:0 auto}
 #fv-content a{color:var(--accent)}
 #fv-content .fv-text-body{font-size:16px;line-height:1.78;color:var(--text-em);word-break:break-word}
-#fv-content .fv-text-body *{max-width:100%}
+#fv-content .fv-text-body:not(.markdown-preview) *{max-width:100%}
 .fv-link-box{background:var(--bg-subtle);border:1px solid var(--border);border-radius:var(--radius-lg);padding:18px 20px;display:flex;flex-direction:column;gap:8px}
 .fv-link-url{font-size:14px;color:var(--accent);word-break:break-all;font-family:var(--font-mono)}
 .fv-link-title{font-size:16px;font-weight:600;color:var(--text-em)}
@@ -733,19 +733,19 @@ function stripMarkdown(markdown){
     .trim();
 }
 function renderMarkdownPreview(markdown){
+  renderMarkdownInto(editorMarkdownPreview,markdown);
+}
+function renderMarkdownInto(target,markdown){
   const source=String(markdown||'').trim();
   if(!source){
-    editorMarkdownPreview.innerHTML='<p style="color:var(--text-dim)">Preview updates as you type…</p>';
+    target.innerHTML='<p style="color:var(--text-dim)">Preview updates as you type…</p>';
     return;
   }
-  const prepared = source
-    .replace(/(\n|^)\$\$([\s\S]+?)\$\$/g, (_, prefix, body) => `${prefix}\n\n$$\n${body.trim()}\n$$\n\n`)
-    .replace(/\r\n/g, '\n');
-  const rawHtml = typeof marked !== 'undefined' ? marked.parse(prepared, { gfm: true, breaks: true }) : prepared.replace(/\n/g, '<br>');
-  editorMarkdownPreview.innerHTML = sanitizeHTML(rawHtml);
+  const rawHtml=renderMarkdownHTML(source);
+  target.innerHTML=sanitizeHTML(rawHtml);
   if(window.MathJax && typeof window.MathJax.typesetPromise === 'function'){
-    window.MathJax.typesetPromise([editorMarkdownPreview]).catch(()=>{});
-    setTimeout(()=>window.MathJax.typesetPromise([editorMarkdownPreview]).catch(()=>{}), 25);
+    window.MathJax.typesetPromise([target]).catch(()=>{});
+    setTimeout(()=>window.MathJax.typesetPromise([target]).catch(()=>{}),25);
   }
 }
 function toast(msg,type='success',dur=2800){
@@ -879,11 +879,33 @@ async function saveItem(item){
   applyFilters();
   toast(idx>=0?'Updated!':'Saved!','success');
 }
+function foldersForNewItem(){return activeFolderId?[activeFolderId]:[]}
 
 function extractLinkTitle(html,url){
   if(!html)return url;
   const m=html.match(/>([^<]{2,80})</);
   return m?m[1].trim():url;
+}
+
+function hasMarkdownTokens(tokens){
+  return tokens.some(token=>{
+    if(['heading','blockquote','list','code','table','hr','image','link','strong','em','del'].includes(token.type))return true;
+    return Array.isArray(token.tokens)&&hasMarkdownTokens(token.tokens);
+  });
+}
+function hasMathDelimiters(text){
+  return /\$\$[\s\S]+?\$\$|\\\[[\s\S]+?\\\]|\$[^$\r\n]+?\$|\\\([^\r\n]+?\\\)/.test(text);
+}
+function renderMarkdownHTML(markdown){
+  const mathBlocks=[];
+  const source=String(markdown||'').replace(/\$\$([\s\S]+?)\$\$|\\\[([\s\S]+?)\\\]/g,(_,dollarBody,bracketBody)=>{
+    const marker=`SAVEIT_MATH_BLOCK_${mathBlocks.length}`;
+    mathBlocks.push(`\\[${(dollarBody??bracketBody).trim()}\\]`);
+    return `\n\n${marker}\n\n`;
+  }).replace(/\r\n/g,'\n');
+  let html=typeof marked!=='undefined'?marked.parse(source,{gfm:true,breaks:true}):source.replace(/\n/g,'<br>');
+  mathBlocks.forEach((block,index)=>{html=html.replaceAll(`SAVEIT_MATH_BLOCK_${index}`,block)});
+  return html;
 }
 
 async function processRawContent(html,plain,files){
@@ -893,7 +915,7 @@ async function processRawContent(html,plain,files){
       if(f.type.startsWith('image/')){
         const reader=new FileReader();
         reader.onload=async ev=>{
-          await saveItem({id:uid(),type:'image',data:ev.target.result,filename:f.name,folders:[],savedAt:Date.now()});
+          await saveItem({id:uid(),type:'image',data:ev.target.result,filename:f.name,folders:foldersForNewItem(),savedAt:Date.now()});
         };
         reader.readAsDataURL(f);
         return true;
@@ -901,9 +923,10 @@ async function processRawContent(html,plain,files){
     }
   }
   const textTrimmed=(plain||'').trim();
+  const isMarkdownText=textTrimmed && ((typeof marked!=='undefined' && hasMarkdownTokens(marked.lexer(textTrimmed)))||hasMathDelimiters(textTrimmed));
   // 2. Pure URL
   if(!html&&isURL(textTrimmed)){
-    await saveItem({id:uid(),type:'link',url:textTrimmed,title:textTrimmed,folders:[],savedAt:Date.now()});
+    await saveItem({id:uid(),type:'link',url:textTrimmed,title:textTrimmed,folders:foldersForNewItem(),savedAt:Date.now()});
     return true;
   }
   // 3. HTML containing rich content
@@ -913,20 +936,24 @@ async function processRawContent(html,plain,files){
     const anchors=div.querySelectorAll('a');
     const imgSrc=(()=>{const img=div.querySelector('img');return img?img.src:null})();
     if(imgSrc&&/\.(png|jpg|jpeg|gif|webp|svg|avif)(\?.*)?$/i.test(imgSrc)&&stripHTML(html).trim().length<20){
-      await saveItem({id:uid(),type:'image',src:imgSrc,folders:[],savedAt:Date.now()});
+      await saveItem({id:uid(),type:'image',src:imgSrc,folders:foldersForNewItem(),savedAt:Date.now()});
       return true;
     }
     if(anchors.length===1&&stripHTML(html).trim().length<100&&isURL(anchors[0].href)){
-      await saveItem({id:uid(),type:'link',url:anchors[0].href,title:stripHTML(html).trim()||anchors[0].href,folders:[],savedAt:Date.now()});
+      await saveItem({id:uid(),type:'link',url:anchors[0].href,title:stripHTML(html).trim()||anchors[0].href,folders:foldersForNewItem(),savedAt:Date.now()});
       return true;
     }
     // Rich text — sanitize preserving colors
     const cleanHtml=sanitizeHTML(html);
-    await saveItem({id:uid(),type:'text',html:cleanHtml,plain:plain||stripHTML(cleanHtml),folders:[],savedAt:Date.now()});
+    await saveItem({id:uid(),type:'text',html:cleanHtml,plain:plain||stripHTML(cleanHtml),folders:foldersForNewItem(),savedAt:Date.now()});
     return true;
   }
   if(textTrimmed){
-    await saveItem({id:uid(),type:'text',plain:textTrimmed,folders:[],savedAt:Date.now()});
+    if(isMarkdownText){
+      await saveItem({id:uid(),type:'markdown',markdown:textTrimmed,plain:stripMarkdown(textTrimmed),folders:foldersForNewItem(),savedAt:Date.now()});
+    } else {
+      await saveItem({id:uid(),type:'text',plain:textTrimmed,folders:foldersForNewItem(),savedAt:Date.now()});
+    }
     return true;
   }
   return false;
@@ -960,7 +987,7 @@ document.addEventListener('paste',async e=>{
       if(f){
         const reader=new FileReader();
         reader.onload=async ev=>{
-          await saveItem({id:uid(),type:'image',data:ev.target.result,filename:'clipboard-image.png',folders:[],savedAt:Date.now()});
+          await saveItem({id:uid(),type:'image',data:ev.target.result,filename:'clipboard-image.png',folders:foldersForNewItem(),savedAt:Date.now()});
         };
         reader.readAsDataURL(f);
         return;
@@ -1334,20 +1361,16 @@ function renderFullview(){
     fvContent.appendChild(box);
   } else {
     const wrapper=document.createElement('div');
-    wrapper.className='fv-text-body';
+    wrapper.className='fv-text-body markdown-preview';
+    fvContent.appendChild(wrapper);
     if(item.type==='markdown'){
-      const markdownHtml = typeof marked !== 'undefined' ? marked.parse(item.markdown || '') : (item.markdown||'').replace(/\n/g,'<br>');
-      wrapper.innerHTML = sanitizeHTML(markdownHtml);
-      if(window.MathJax && typeof window.MathJax.typesetPromise === 'function'){
-        window.MathJax.typesetPromise([wrapper]).catch(()=>{});
-      }
+      renderMarkdownInto(wrapper,item.markdown||'');
     } else if(item.html){
       wrapper.innerHTML=sanitizeHTML(item.html);
     } else {
       wrapper.style.whiteSpace='pre-wrap';
       wrapper.textContent=item.plain||'';
     }
-    fvContent.appendChild(wrapper);
   }
 }
 

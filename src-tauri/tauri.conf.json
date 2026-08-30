@@ -16,6 +16,7 @@
         "minWidth": 760,
         "minHeight": 560,
         "resizable": true,
+        "devtools": true,
         "dragDropEnabled": false
       }
     ],
