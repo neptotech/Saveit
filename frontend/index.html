@@ -591,6 +591,38 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--text);min-heigh
 </div>
 
 <script>
+(function initNightLightOverlay() {
+  const existing = document.getElementById('night-light-svg');
+  if (existing) return;
+
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.id = 'night-light-svg';
+  svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+  svg.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden;pointer-events:none';
+
+  svg.innerHTML = `
+    <defs>
+      <filter id="night-light-filter" x="0%" y="0%" width="100%" height="100%"
+              color-interpolation-filters="sRGB">
+        <feColorMatrix type="matrix" values="
+          1.0000  0       0       0  0
+          0       0.9066  0       0  0
+          0       0       0.8314  0  0
+          0       0       0       1  0"/>
+      </filter>
+    </defs>
+  `;
+
+  const target = document.body || document.documentElement;
+  target.appendChild(svg);
+
+  const root = document.documentElement;
+  root.dataset.nightLight = 'on';
+  root.style.filter = 'url("#night-light-filter")';
+})();
+</script>
+
+<script>
 /* ══════════════════════════════════════════════════════
    Tauri JSON storage — persisted by the Rust backend
    ══════════════════════════════════════════════════════ */

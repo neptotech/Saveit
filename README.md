@@ -5,6 +5,7 @@
 ![alt text](/images/image-1.png)
 ![alt text](/images/image-3.png)
 ![alt text](/images/image-4.png)
+![alt text](/images/image-5.png)
 <a id="target-anchor"></a>
 SaveIt is a fast, local-first desktop inbox for keeping text, rich content, links, images, and files organised in one place. Drop content onto the home screen, paste from the clipboard, or write a note in the editor, and save them into a folder. Supports LaTeX/Math rendering in markdown, HTML and Markdown editing modes, and automatic file link creation and opening.
 
