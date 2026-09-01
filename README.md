@@ -6,7 +6,7 @@
 ![alt text](/images/image-3.png)
 ![alt text](/images/image-4.png)
 <a id="target-anchor"></a>
-SaveIt is a fast, local-first desktop inbox for keeping text, rich content, links, images, and files organised in one place. Drop content onto the home screen, paste from the clipboard, or write a note in the editor, and save them into a folder.
+SaveIt is a fast, local-first desktop inbox for keeping text, rich content, links, images, and files organised in one place. Drop content onto the home screen, paste from the clipboard, or write a note in the editor, and save them into a folder. Supports LaTeX/Math rendering in markdown, HTML and Markdown editing modes, and automatic file link creation and opening.
 
 Built with Rust and Tauri 2. [Thus light weight *8MB* portable app or *2MB installer*!]
 
@@ -15,14 +15,20 @@ Built with Rust and Tauri 2. [Thus light weight *8MB* portable app or *2MB insta
 ## Features
 
 - Drag and drop text, rich HTML, links, images, and files onto the home screen
-- Drop files into the editor at the mouse-release position
+- Drop or paste files directly into the Markdown and rich-text editors with automatic URL-encoded file links
+- Automatic file link creation on paste/drop with proper `file:///` URI handling
+- Click file links to open them with their Windows file association
 - Upload files through the editor toolbar
 - Store notes and copied files in the user's OneDrive Documents folder when available
 - Fall back to the user's local Documents folder when OneDrive Documents is unavailable
 - Change the storage root from the Settings menu; SaveIt copies existing data before reloading
 - Organize notes with folders and drag notes between folders
+- New notes automatically added to the currently active folder
 - Search, filter, sort, and switch between grid and list views
-- Edit rich text with formatting, links, images, colors, and highlights
+- Edit in two modes:
+  - **Markdown**: Full markdown support with LaTeX/Math rendering ($$...$$, \\[...\\])
+  - **Rich-text**: WYSIWYG editor with formatting, links, images, colors, highlights, and HTML link support
+- Smart format chooser: automatically detects mixed HTML+Markdown content and prompts for format
 - Open web links in the default browser
 - Open saved files with their Windows file association or Open With dialog
 - Multi-select notes with Ctrl/Cmd-click and Shift-click
@@ -31,8 +37,8 @@ Built with Rust and Tauri 2. [Thus light weight *8MB* portable app or *2MB insta
 
 For Windows, use one of the generated installers from the release assets: [Get it here](https://github.com/neptotech/Saveit/releases/latest/)
 
-- `SaveIt_1.0.0_x64-setup.exe` for the NSIS installer
-- `SaveIt_1.0.0_x64_en-US.msi` for the MSI installer
+- `SaveIt_2.1.0_x64-setup.exe` for the NSIS installer
+- `SaveIt_2.1.0_x64_en-US.msi` for the MSI installer
 
 The standalone portable executable is `saveit.exe`.
 
@@ -83,8 +89,8 @@ Build output is written to:
 
 ```text
 src-tauri/target/release/saveit.exe
-src-tauri/target/release/bundle/nsis/SaveIt_1.0.0_x64-setup.exe
-src-tauri/target/release/bundle/msi/SaveIt_1.0.0_x64_en-US.msi
+src-tauri/target/release/bundle/nsis/SaveIt_2.1.0_x64-setup.exe
+src-tauri/target/release/bundle/msi/SaveIt_2.1.0_x64_en-US.msi
 ```
 
 ## Data and file storage
