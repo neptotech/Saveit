@@ -420,6 +420,7 @@ body{font-family:var(--font-ui);background:var(--bg);color:var(--text);min-heigh
     <button class="filter-pill" data-filter="text">Text</button>
     <button class="filter-pill" data-filter="image">Images</button>
     <button class="filter-pill" data-filter="link">Links</button>
+    <button class="filter-pill" data-filter="files">Files</button>
   </div>
   <div id="selection-bar">
     <span class="sb-count"><span id="sb-count-num">0</span> selected</span>
@@ -924,6 +925,14 @@ async function saveItem(item){
 }
 function foldersForNewItem(){return activeFolderId?[activeFolderId]:[]}
 
+// Encode file path to proper file:// URL with percent-encoding for spaces and special chars
+function encodeFilePath(path){
+  if(!path)return '';
+  const normalized=path.replace(/\\/g,'/');
+  const encoded=normalized.split('/').map(segment=>encodeURIComponent(segment)).join('/');
+  return `file:///${encoded}`;
+}
+
 function extractLinkTitle(html,url){
   if(!html)return url;
   const m=html.match(/>([^<]{2,80})</);
@@ -959,6 +968,19 @@ async function processRawContent(html,plain,files){
         const reader=new FileReader();
         reader.onload=async ev=>{
           await saveItem({id:uid(),type:'image',data:ev.target.result,filename:f.name,folders:foldersForNewItem(),savedAt:Date.now()});
+        };
+        reader.readAsDataURL(f);
+        return true;
+      } else {
+        // Non-image file: store and create files-type note
+        const reader=new FileReader();
+        reader.onload=async ev=>{
+          try{
+            const result=await invoke('store_file',{storagePath,filename:f.name,contents:ev.target.result.split(',')[1]});
+            const path=result.path;
+            await saveItem({id:uid(),type:'files',filename:f.name,path:path,folders:foldersForNewItem(),savedAt:Date.now()});
+            toast(`File "${f.name}" saved`,'success');
+          }catch(e){toast(`Failed to save file: ${e}`,'error')}
         };
         reader.readAsDataURL(f);
         return true;
@@ -1101,6 +1123,12 @@ function buildCard(item,idx){
     img.loading='lazy';
     img.onerror=()=>{img.style.display='none'};
     el.appendChild(img);
+  } else if(item.type==='files'){
+    const icon=document.createElement('div');
+    icon.className='card-img-preview';
+    icon.style.cssText='display:flex;align-items:center;justify-content:center;background:var(--bg-subtle);font-size:48px';
+    icon.textContent='📁';
+    el.appendChild(icon);
   }
 
   const body=document.createElement('div');
@@ -1120,6 +1148,12 @@ function buildCard(item,idx){
     const urlEl=document.createElement('div');
     urlEl.className='card-link-url';urlEl.textContent=item.url;
     body.appendChild(title);body.appendChild(urlEl);
+  } else if(item.type==='files'){
+    title.textContent=item.filename||'File';
+    const pathEl=document.createElement('div');
+    pathEl.className='card-link-url';
+    pathEl.textContent=item.path?item.path.split('\\').pop():'';
+    body.appendChild(title);body.appendChild(pathEl);
   } else {
     title.textContent=item.title||item.filename||'Image';
     body.appendChild(title);
@@ -1407,6 +1441,22 @@ function renderFullview(){
       <a class="fv-link-url" href="${escHTML(item.url)}" target="_blank" rel="noopener">${escHTML(item.url)}</a>
       <a href="${escHTML(item.url)}" target="_blank" rel="noopener" style="display:inline-block;margin-top:6px;padding:6px 14px;background:var(--accent);color:#fff;border-radius:6px;font-size:13px;text-decoration:none">Open ↗</a>`;
     fvContent.appendChild(box);
+  } else if(item.type==='files'){
+    const box=document.createElement('div');box.className='fv-link-box';
+    const filename=item.filename||item.path.split('\\').pop()||'File';
+    box.innerHTML=`
+      <div class="fv-link-title">📁 ${escHTML(filename)}</div>
+      <div class="fv-link-url" style="font-size:12px;color:var(--text-dim);margin-bottom:8px">${escHTML(item.path||'')}</div>`;
+    const openBtn=document.createElement('button');
+    openBtn.textContent='Open File';
+    openBtn.style.cssText='display:inline-block;padding:6px 14px;background:var(--accent);color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer';
+    openBtn.addEventListener('click',async()=>{
+      try{
+        await invoke('open_file',{storagePath,path:item.path});
+      }catch(e){toast(`Failed to open file: ${e}`,'error')}
+    });
+    box.appendChild(openBtn);
+    fvContent.appendChild(box);
   } else {
     const wrapper=document.createElement('div');
     wrapper.className='fv-text-body markdown-preview';
@@ -1543,6 +1593,63 @@ function updateEditorUI(){
 editorTypeSelect.addEventListener('change',updateEditorUI);
 editorMarkdownInput.addEventListener('input',()=>renderMarkdownPreview(editorMarkdownInput.value));
 
+/* Markdown editor: handle drop and paste for files */
+editorMarkdownInput.addEventListener('dragover',e=>e.preventDefault());
+editorMarkdownInput.addEventListener('drop',async e=>{
+  e.preventDefault();e.stopPropagation();
+  const files=Array.from(e.dataTransfer?.files||[]);
+  if(!files.length)return;
+  const f=files[0];
+  if(f.type.startsWith('image/'))return; // Skip images in markdown
+  
+  const reader=new FileReader();
+  reader.onload=async ev=>{
+    try{
+      const result=await invoke('store_file',{storagePath,filename:f.name,contents:ev.target.result.split(',')[1]});
+      const path=result.path;
+      const cursorPos=editorMarkdownInput.selectionStart;
+      const before=editorMarkdownInput.value.substring(0,cursorPos);
+      const after=editorMarkdownInput.value.substring(cursorPos);
+      const link=`[${f.name}](${encodeFilePath(path)})`;
+      editorMarkdownInput.value=before+link+after;
+      editorMarkdownInput.selectionStart=editorMarkdownInput.selectionEnd=cursorPos+link.length;
+      renderMarkdownPreview(editorMarkdownInput.value);
+      toast(`File link inserted`,'success');
+    }catch(e){toast(`Failed to store file: ${e}`,'error')}
+  };
+  reader.readAsDataURL(f);
+});
+
+editorMarkdownInput.addEventListener('paste',async e=>{
+  const cd=e.clipboardData;
+  const files=Array.from(cd?.items||[]);
+  for(const item of files){
+    if(item.kind==='file' && !item.type.startsWith('image/')){
+      e.preventDefault();
+      const f=item.getAsFile();
+      if(f){
+        const reader=new FileReader();
+        reader.onload=async ev=>{
+          try{
+            const result=await invoke('store_file',{storagePath,filename:f.name,contents:ev.target.result.split(',')[1]});
+            const path=result.path;
+            const cursorPos=editorMarkdownInput.selectionStart;
+            const before=editorMarkdownInput.value.substring(0,cursorPos);
+            const after=editorMarkdownInput.value.substring(cursorPos);
+            const link=`[${f.name}](${encodeFilePath(path)})`;
+            editorMarkdownInput.value=before+link+after;
+            editorMarkdownInput.selectionStart=editorMarkdownInput.selectionEnd=cursorPos+link.length;
+            renderMarkdownPreview(editorMarkdownInput.value);
+            toast(`File link inserted`,'success');
+          }catch(err){toast(`Failed to store file: ${err}`,'error')}
+        };
+        reader.readAsDataURL(f);
+        return;
+      }
+    }
+  }
+});
+
 function closeEditor(){
   editorModal.classList.remove('open');
   document.body.style.overflow='';
@@ -1579,7 +1686,7 @@ document.getElementById('ed-save-btn').addEventListener('click',async()=>{
       markdown:cleanMarkdown,
       plain:stripMarkdown(cleanMarkdown),
       title:title||stripMarkdown(cleanMarkdown).slice(0,60),
-      folders:existing?(existing.folders||[]):[],
+      folders:existing?(existing.folders||[]):foldersForNewItem(),
       savedAt:existing?existing.savedAt:Date.now(),
       updatedAt:Date.now()
     });
@@ -1591,20 +1698,20 @@ document.getElementById('ed-save-btn').addEventListener('click',async()=>{
     const url=editorUrlInput.value.trim();
     if(!url){toast('Enter a URL','error');return}
     const linkTitle=title||editorBody.textContent.trim()||url;
-    await saveItem({id:editingId||uid(),type:'link',url,title:linkTitle,folders:editingId?(allItems.find(i=>i.id===editingId)?.folders||[]):[],savedAt:editingId?allItems.find(i=>i.id===editingId)?.savedAt||Date.now():Date.now(),updatedAt:Date.now()});
+    await saveItem({id:editingId||uid(),type:'link',url,title:linkTitle,folders:editingId?(allItems.find(i=>i.id===editingId)?.folders||[]):foldersForNewItem(),savedAt:editingId?allItems.find(i=>i.id===editingId)?.savedAt||Date.now():Date.now(),updatedAt:Date.now()});
     closeEditor();return;
   }
 
   if(type==='image'){
     const url=editorUrlInput.value.trim();
     if(url){
-      await saveItem({id:editingId||uid(),type:'image',src:url,title:title||url,folders:editingId?(allItems.find(i=>i.id===editingId)?.folders||[]):[],savedAt:editingId?allItems.find(i=>i.id===editingId)?.savedAt||Date.now():Date.now(),updatedAt:Date.now()});
+      await saveItem({id:editingId||uid(),type:'image',src:url,title:title||url,folders:editingId?(allItems.find(i=>i.id===editingId)?.folders||[]):foldersForNewItem(),savedAt:editingId?allItems.find(i=>i.id===editingId)?.savedAt||Date.now():Date.now(),updatedAt:Date.now()});
       closeEditor();return;
     }
     // image in body
     const imgEl=editorBody.querySelector('img');
     if(imgEl){
-      await saveItem({id:editingId||uid(),type:'image',data:imgEl.src,title:title||'Image',folders:editingId?(allItems.find(i=>i.id===editingId)?.folders||[]):[],savedAt:editingId?allItems.find(i=>i.id===editingId)?.savedAt||Date.now():Date.now(),updatedAt:Date.now()});
+      await saveItem({id:editingId||uid(),type:'image',data:imgEl.src,title:title||'Image',folders:editingId?(allItems.find(i=>i.id===editingId)?.folders||[]):foldersForNewItem(),savedAt:editingId?allItems.find(i=>i.id===editingId)?.savedAt||Date.now():Date.now(),updatedAt:Date.now()});
       closeEditor();return;
     }
     toast('No image to save','error');return;
@@ -1623,7 +1730,7 @@ document.getElementById('ed-save-btn').addEventListener('click',async()=>{
     html:cleanHtml,
     plain,
     title:title||plain.slice(0,60),
-    folders:existing?(existing.folders||[]):[],
+    folders:existing?(existing.folders||[]):foldersForNewItem(),
     savedAt:existing?existing.savedAt:Date.now(),
     updatedAt:Date.now()
   });
@@ -1664,22 +1771,42 @@ editorBody.addEventListener('drop',async e=>{
     }
   };
 
-  if(files.length&&files[0].type.startsWith('image/')){
-    const f=files[0];
-    const reader=new FileReader();
-    reader.onload=async ev=>{
-      await insertHTML(`<img src="${ev.target.result}" style="max-width:100%">`);
-    };
-    reader.readAsDataURL(f);
-    return;
-  }
-  if(html){await insertHTML(html);return}
-  if(plain){
+  const insertText=async(t)=>{
     if(range){
       const sel=window.getSelection();
       sel.removeAllRanges();sel.addRange(range);
     }
-    document.execCommand('insertText',false,plain);
+    document.execCommand('insertText',false,t);
+  };
+
+  if(files.length){
+    const f=files[0];
+    if(f.type.startsWith('image/')){
+      const reader=new FileReader();
+      reader.onload=async ev=>{
+        await insertHTML(`<img src="${ev.target.result}" style="max-width:100%">`);
+      };
+      reader.readAsDataURL(f);
+      return;
+    } else {
+      // Non-image file in rich-text editor: create HTML link
+      const reader=new FileReader();
+      reader.onload=async ev=>{
+        try{
+          const result=await invoke('store_file',{storagePath,filename:f.name,contents:ev.target.result.split(',')[1]});
+          const path=result.path;
+          const fileLink=`<a href="${encodeFilePath(path)}" class="file-link" data-file-path="${escHTML(path)}" title="${escHTML(f.name)}">${escHTML(f.name)}</a>`;
+          await insertHTML(fileLink);
+          toast(`File link inserted`,'success');
+        }catch(e){toast(`Failed to store file: ${e}`,'error')}
+      };
+      reader.readAsDataURL(f);
+      return;
+    }
+  }
+  if(html){await insertHTML(html);return}
+  if(plain){
+    await insertText(plain);
   }
 });
 
@@ -1767,16 +1894,16 @@ function updateToolbarState(){
 editorBody.addEventListener('keyup',updateToolbarState);
 editorBody.addEventListener('mouseup',updateToolbarState);
 
-/* Paste inside editor — sanitize preserving color */
-editorBody.addEventListener('paste',e=>{
-  e.preventDefault();
+/* Paste inside editor — sanitize preserving color, handle files */
+editorBody.addEventListener('paste',async e=>{
   const cd=e.clipboardData;
   const html=cd.getData('text/html');
   const plain=cd.getData('text/plain');
 
-  // Check for image blob
+  // Check for files (including images)
   for(const item of cd.items||[]){
     if(item.type.startsWith('image/')){
+      e.preventDefault();
       const f=item.getAsFile();
       if(f){
         const reader=new FileReader();
@@ -1786,10 +1913,28 @@ editorBody.addEventListener('paste',e=>{
         reader.readAsDataURL(f);
         return;
       }
+    } else if(item.kind==='file'){
+      e.preventDefault();
+      const f=item.getAsFile();
+      if(f){
+        const reader=new FileReader();
+        reader.onload=async ev=>{
+          try{
+            const result=await invoke('store_file',{storagePath,filename:f.name,contents:ev.target.result.split(',')[1]});
+            const path=result.path;
+            const fileLink=`<a href="${encodeFilePath(path)}" class="file-link" data-file-path="${escHTML(path)}" title="${escHTML(f.name)}">${escHTML(f.name)}</a>`;
+            document.execCommand('insertHTML',false,fileLink);
+            toast(`File link inserted`,'success');
+          }catch(err){toast(`Failed to store file: ${err}`,'error')}
+        };
+        reader.readAsDataURL(f);
+        return;
+      }
     }
   }
 
   if(html){
+    e.preventDefault();
     const clean=sanitizeHTML(html,{collapseBase64:true});
     document.execCommand('insertHTML',false,clean);
   } else if(plain){
@@ -1811,6 +1956,21 @@ document.querySelectorAll('.filter-pill').forEach(pill=>{
   });
 });
 searchEl.addEventListener('input',()=>{searchQ=searchEl.value.trim();applyFilters()});
+
+/* ── File link opening ── */
+document.addEventListener('click',async e=>{
+  const link=e.target.closest('a.file-link, a[href^="file:///"]');
+  if(!link)return;
+  const href=link.getAttribute('href');
+  if(!href.startsWith('file:///'))return;
+  e.preventDefault();
+  e.stopPropagation();
+  const path=link.getAttribute('data-file-path')||decodeURIComponent(href.substring(8)); // Remove 'file:///' prefix
+  const normalizedPath=path.replace(/\//g,'\\'); // Convert forward slashes to backslashes for Windows
+  try{
+    await invoke('open_file',{storagePath,path:normalizedPath});
+  }catch(err){toast(`Failed to open file: ${err}`,'error')}
+},true);
 
 /* ══ Global keyboard ══ */
 document.addEventListener('keydown',e=>{
